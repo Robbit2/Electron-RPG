@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script defer src="script.js"></script>
+    <title>RPG</title>
+</head>
+<body>
+    <div class="sidebar">
+        <meter id="healthBar" value="100" max="100" high="10" low="3"></meter>
+        <span id="healthTxt">❤️ Health: 100/100</span><br>
+        <span id="defenseTxt">🛡️ Defense: 10</span><br>
+        <span id="attackTxt">⚔️ Attack: 10</span><br>
+        <span id="ehpTxt">💚 Effective Health: 110</span>
+        <br>
+        <button id="savebtn">Save</button><button id="loadbtn">Load</button>
+    </div>
+    <div class="stats">
+        <div id="equipped">
+            <div class="tooltip" id="head">
+                <span class="tooltiptext">Empty</span>
+            </div>
+            <div class="tooltip" id="chest">
+                <span class="tooltiptext">Empty</span>
+            </div>
+            <div class="tooltip" id="legs">
+                <span class="tooltiptext">Empty</span>
+            </div>
+            <div class="tooltip" id="weapon">
+                <span class="tooltiptext">Empty</span>
+            </div>
+            <div class="tooltip" id="accessory_1">
+                <span class="tooltiptext">Empty</span>
+            </div>
+            <div class="tooltip" id="accessory_2">
+                <span class="tooltiptext">Empty</span>
+            </div>
+        </div>
+        <div id="enemy">
+            <button id="enemy-attack">Attack</button>
+            <div style="float:right;">
+                <h3 id="enemy-name">Enemy</h3>
+                <img src="./img/ui/blank_person.png" height="128px" width="128px" id="enemy-img"><br>
+                <span id="enemy-health">❤️ Health: 100</span><br>
+                <span id="enemy-defense">🛡️ Defense: 10</span><br>
+                <span id="enemy-attackTxt">⚔️ Attack: 10</span>
+            </div>
+        </div>
+        <div id="inventory">
+
+        </div>
+    </div>
+</body>
+</html> 
