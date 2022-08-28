@@ -27,10 +27,19 @@ var stats = {
 
 
 function chooseEnemy(){
-    if(stats.level <= 10){
-        let randInt = Math.floor(Math.random()* 2);
-        console.log(randInt);
-    }
+    if(stats.currentEnemy == null){
+        if(stats.level <= 10){
+            let randInt = Math.floor(Math.random()* 2);
+            console.log(randInt);
+            if(randInt == 0){
+                stats.currentEnemy = new enemies.large_rat(Math.ceil(Math.random()*10),Math.ceil(Math.random()*100),Math.ceil(Math.random()*10),Math.ceil(Math.random()*10));
+                console.log(stats.currentEnemy);
+            }else{
+                stats.currentEnemy = new enemies.slime(Math.ceil(Math.random()*10),Math.ceil(Math.random()*100),Math.ceil(Math.random()*10),Math.ceil(Math.random()*10));
+                console.log(stats.currentEnemy);
+            }
+        }
+    }else{}
 }
 
 // --- [ Updates the player's inventory ] --- \\
@@ -42,6 +51,22 @@ function updateInventory(){
     }
 }
 
+
+function renderEnemy(){
+    console.log(stats.currentEnemy)
+    const enemyhpDOM = document.querySelector("#enemy-health");
+    const enemydefDOM = document.querySelector("#enemy-defense");
+    const enemyatkDOM = document.querySelector("#enemy-attackTxt");
+    const enemyimg = document.querySelector("#enemy-img");
+    const enemyName = document.querySelector("#enemy-name")
+    setInterval(() => {
+        enemyhpDOM.innerHTML = `❤️ Health: ${stats.currentEnemy.getStats()[0]}`;
+        enemydefDOM.innerHTML = `🛡️ Defense: ${stats.currentEnemy.getStats()[1]}`;
+        enemyatkDOM.innerHTML = `⚔️ Attack: ${stats.currentEnemy.getStats()[2]}`;
+        enemyimg.src = stats.currentEnemy.img;
+        enemyName.innerHTML = stats.currentEnemy.name()
+    },100)
+}
 
 // --- [ Updates the player's equipped items ] --- \\
 function updateEquipped(){
@@ -164,4 +189,5 @@ const saveClient = () => {
 updateEquipped();
 updateHealth();
 updateInventory();
-chooseEnemy()
+chooseEnemy();
+renderEnemy();
