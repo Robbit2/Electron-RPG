@@ -8,11 +8,11 @@ console.log(os.userInfo().username);*/
 var stats = {
     health : 100, 
     maxHealth: 100,
-    attack : 10,
-    defense : 10,
+    attack : 5,
+    defense : 5,
     level: 0,
     xp: 0,
-    inventory : [{name:"Stick",img:"./img/items/weapons/swords/stick.png",id:"weapon:stick",atk:5,def:0,type:"weapon",rarity:"#a8a8a8"},{name:"Wooden Helmet",img:"./img/items/armor/wooden_helmet.png",id:"armor:wooden_helmet",atk:0,def:5,type:"armor.helmet",rarity:"#a8a8a8"}],
+    inventory : [{name:"Stick",img:"./img/items/weapons/swords/stick.png",id:"weapon:stick",atk:5,def:0,type:"weapon",rarity:"#a8a8a8",level:1,gilded:false},{name:"Wooden Helmet",img:"./img/items/armor/wooden_helmet.png",id:"armor:wooden_helmet",atk:0,def:5,type:"armor.helmet",rarity:"#a8a8a8",level:1,gilded:false}],
     equipped : {
         head : null,
         chest : null,
@@ -47,7 +47,7 @@ function updateInventory(){
     const invDOM = document.querySelector("#inventory");
     invDOM.innerHTML = "";
     for(_ in stats.inventory){
-        invDOM.innerHTML += `<div class="tooltip" onclick="equip(${_});" style="height:64px;width:64px;background-color:${stats.inventory[_].rarity};background-image:url(${stats.inventory[_].img});background-size: cover;border:4px solid rgb(92, 91, 91);"><span class="tooltiptext">${stats.inventory[_].name}</span></div>`;
+        invDOM.innerHTML += `<div class="tooltip" onclick="equip(${_});" style="height:64px;width:64px;background-color:${stats.inventory[_].rarity};background-image:url(${stats.inventory[_].img});background-size: cover;border:4px solid rgb(92, 91, 91);"><span class="tooltiptext">[Lv.${stats.inventory[_].level}] ${stats.inventory[_].name}</span></div>`;
     }
 }
 
@@ -64,7 +64,7 @@ function renderEnemy(){
         enemydefDOM.innerHTML = `🛡️ Defense: ${stats.currentEnemy.getStats()[1]}`;
         enemyatkDOM.innerHTML = `⚔️ Attack: ${stats.currentEnemy.getStats()[2]}`;
         enemyimg.src = stats.currentEnemy.img;
-        enemyName.innerHTML = stats.currentEnemy.name()
+        enemyName.innerHTML = stats.currentEnemy.name();
     },100)
 }
 
@@ -78,7 +78,7 @@ function updateEquipped(){
             document.querySelector(itemDOM).style.backgroundSize = "cover";
         }else{
             let itemDOM = `#${_}`;
-            document.querySelector(itemDOM).innerHTML = `<div class="tooltip" onclick="unequip('${_}')" style="height:64px;width:64px;background-image:url(${stats.equipped[_].img});background-size: cover;"><span class="tooltiptext">${stats.equipped[_].name}<br>⚔️ Attack: ${stats.equipped[_].atk}<br>🛡️ Defense: ${stats.equipped[_].def}</span></div>`;
+            document.querySelector(itemDOM).innerHTML = `<div class="tooltip" onclick="unequip('${_}')" style="height:64px;width:64px;background-image:url(${stats.equipped[_].img});background-size: cover;"><span class="tooltiptext">[Lv.${stats.equipped[_].level}]${stats.equipped[_].name}<br>⚔️ Attack: ${stats.equipped[_].atk}<br>🛡️ Defense: ${stats.equipped[_].def}</span></div>`;
             document.querySelector(itemDOM).style.background = stats.equipped[_].rarity;
         }
     }
@@ -133,11 +133,6 @@ function updateHealth(){
     },100)
 }
 
-
-function attack(){
-
-}
-
 function equip(id){
     const item = stats.inventory[id];
     if(item.type == "weapon"){
@@ -185,6 +180,15 @@ const saveClient = () => {
     var base64Stats = btoa(strStats);
     ipc.send('save',base64Stats);
 };
+
+function attack(){
+    var statsTotal = addStats();
+    var passE = Math.floor(statsTotal[0] - statsTotal[0] * (stats.currentEnemy.defense / (stats.currentEnemy.defense + 100)));
+    var passP = Math.floor(stats.currentEnemy.defense - stats.currentEnemy.defense * (statsTotal[0] / (statsTotal[0] + 100)));
+    console.log(passE,passP);
+    stats.currentEnemy.health -= passE;
+    stats.health -= passP;
+}
 
 updateEquipped();
 updateHealth();
