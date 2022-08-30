@@ -22,7 +22,8 @@ var stats = {
         weapon : null
     },
     attacking: false,
-    currentEnemy: null
+    currentEnemy: null,
+    dead: false
 };
 
 
@@ -78,7 +79,7 @@ function updateEquipped(){
             document.querySelector(itemDOM).style.backgroundSize = "cover";
         }else{
             let itemDOM = `#${_}`;
-            document.querySelector(itemDOM).innerHTML = `<div class="tooltip" onclick="unequip('${_}')" style="height:64px;width:64px;background-image:url(${stats.equipped[_].img});background-size: cover;"><span class="tooltiptext">[Lv.${stats.equipped[_].level}]${stats.equipped[_].name}<br>⚔️ Attack: ${stats.equipped[_].atk}<br>🛡️ Defense: ${stats.equipped[_].def}</span></div>`;
+            document.querySelector(itemDOM).innerHTML = `<div class="tooltip" onclick="unequip('${_}')" style="height:64px;width:64px;background-image:url(${stats.equipped[_].img});background-size: cover;"><span class="tooltiptext">[Lv.${stats.equipped[_].level}] ${stats.equipped[_].name}<br>⚔️ Attack: ${stats.equipped[_].atk}<br>🛡️ Defense: ${stats.equipped[_].def}</span></div>`;
             document.querySelector(itemDOM).style.background = stats.equipped[_].rarity;
         }
     }
@@ -121,6 +122,10 @@ function updateHealth(){
     setInterval(() => {
         var _stats = addStats();
         healthBar.value = stats.health;
+        if(stats.health <= 0 && stats.dead == false){
+            ipc.send("death",stats.currentEnemy.name());
+            stats.dead = true;
+        }
         if(stats.health <= stats.maxHealth / 2){
             healthTxt.innerHTML = `💔 Health: ${stats.health}/${stats.maxHealth}`;
         }else{
@@ -185,7 +190,6 @@ function attack(){
     var statsTotal = addStats();
     var passE = Math.floor(statsTotal[0] - statsTotal[0] * (stats.currentEnemy.defense / (stats.currentEnemy.defense + 100)));
     var passP = Math.floor(stats.currentEnemy.defense - stats.currentEnemy.defense * (statsTotal[0] / (statsTotal[0] + 100)));
-    console.log(passE,passP);
     stats.currentEnemy.health -= passE;
     stats.health -= passP;
 }

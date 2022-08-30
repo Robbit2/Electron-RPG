@@ -34,6 +34,10 @@ ipcMain.on('save', function(event,arg){
     save(arg);
 })
 
+ipcMain.on('death', function(event,arg){
+    dialog.showErrorBox("💀 YOU DIED 💀",`You died to a ${arg}`);
+})
+
 const createWindow = () => {
     win = new BrowserWindow({
         width: 1600,
