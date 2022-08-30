@@ -38,6 +38,10 @@ ipcMain.on('death', function(event,arg){
     dialog.showErrorBox("💀 YOU DIED 💀",`You died to a ${arg}`);
 })
 
+ipcMain.on("killed",function(event,arg){
+    dialog.showMessageBox({title:"⚔ You killed a monster ⚔",message:`You killed a ${arg}`,buttonLabel:"EPIC!",type:"info"});
+})
+
 const createWindow = () => {
     win = new BrowserWindow({
         width: 1600,

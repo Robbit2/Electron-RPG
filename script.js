@@ -53,6 +53,38 @@ function updateInventory(){
 }
 
 
+function getExp(){
+    var cl = stats.level;
+    var xpEarned = 0;
+    if(cl <= 10){
+
+    }if(cl >= 11 && cl <= 20){
+
+    }if(cl >= 21 && cl <= 30){
+
+    }if(cl >= 31 && cl <= 40){
+
+    }if(cl >= 41 && cl <= 50){
+        
+    }if(cl >= 51 && cl <= 60){
+        
+    }if(cl >= 61 && cl <= 70){
+        
+    }if(cl >= 71 && cl <= 80){
+        
+    }if(cl >= 81 && cl <= 90){
+        
+    }if(cl >= 91 && cl <= 100){
+        
+    }if(cl >= 101 && cl <= 110){
+        
+    }if(cl >= 111 && cl <= 120){
+        
+    }if(cl >= 121){
+        
+    }
+}
+
 function renderEnemy(){
     console.log(stats.currentEnemy)
     const enemyhpDOM = document.querySelector("#enemy-health");
@@ -66,6 +98,11 @@ function renderEnemy(){
         enemyatkDOM.innerHTML = `⚔️ Attack: ${stats.currentEnemy.getStats()[2]}`;
         enemyimg.src = stats.currentEnemy.img;
         enemyName.innerHTML = stats.currentEnemy.name();
+        if(stats.currentEnemy.health <= 0){
+            ipc.send('killed',stats.currentEnemy.name());
+            stats.currentEnemy = null;
+            chooseEnemy();
+        }
     },100)
 }
 
