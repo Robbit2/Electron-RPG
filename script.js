@@ -3,8 +3,6 @@ const remote = electron.remote;
 const ipc = electron.ipcRenderer;
 const items = require("./item_db");
 const enemies = require("./enemies")
-/*console.log(os.userInfo());
-console.log(os.userInfo().username);*/
 var stats = {
     health : 100, 
     maxHealth: 100,
@@ -31,13 +29,10 @@ function chooseEnemy(){
     if(stats.currentEnemy == null){
         if(stats.level <= 10){
             let randInt = Math.floor(Math.random()* 2);
-            console.log(randInt);
             if(randInt == 0){
                 stats.currentEnemy = new enemies.large_rat(Math.ceil(Math.random()*10),Math.ceil(Math.random()*100),Math.ceil(Math.random()*10),Math.ceil(Math.random()*10));
-                console.log(stats.currentEnemy);
             }else{
                 stats.currentEnemy = new enemies.slime(Math.ceil(Math.random()*10),Math.ceil(Math.random()*100),Math.ceil(Math.random()*10),Math.ceil(Math.random()*10));
-                console.log(stats.currentEnemy);
             }
         }
     }else{}
@@ -57,36 +52,37 @@ function getExp(){
     var cl = stats.level;
     var xpEarned = 0;
     if(cl <= 10){
-
+        xpEarned = 50 + (5*cl);
     }if(cl >= 11 && cl <= 20){
-
+        xpEarned = 200 + (5*cl);
     }if(cl >= 21 && cl <= 30){
-
+        xpEarned = 500 + (5*cl);
     }if(cl >= 31 && cl <= 40){
-
+        xpEarned = 1000 + (5*cl);
     }if(cl >= 41 && cl <= 50){
-        
+        xpEarned = 3000 + (5*cl);
     }if(cl >= 51 && cl <= 60){
-        
+        xpEarned = 7500 + (5*cl);
     }if(cl >= 61 && cl <= 70){
-        
+        xpEarned = 12000 + (5*cl);
     }if(cl >= 71 && cl <= 80){
-        
+        xpEarned = 20000 + (5*cl);
     }if(cl >= 81 && cl <= 90){
-        
+        xpEarned = 35000 + (5*cl);
     }if(cl >= 91 && cl <= 100){
-        
+        xpEarned = 70000 + (5*cl);
     }if(cl >= 101 && cl <= 110){
-        
+        xpEarned = 115000 + (5*cl);
     }if(cl >= 111 && cl <= 120){
-        
+        xpEarned = 200000 + (5*cl);
     }if(cl >= 121){
-        
+        xpEarned = 350000 + (5*cl);
     }
+    
+    return xpEarned;
 }
 
 function renderEnemy(){
-    console.log(stats.currentEnemy)
     const enemyhpDOM = document.querySelector("#enemy-health");
     const enemydefDOM = document.querySelector("#enemy-defense");
     const enemyatkDOM = document.querySelector("#enemy-attackTxt");
@@ -105,6 +101,12 @@ function renderEnemy(){
         }
     },100)
 }
+
+ipc.on("xpBox", function(event){
+    let xp = getExp();
+    ipc.send('gotXP',xp);
+    console.log(xp);
+})
 
 // --- [ Updates the player's equipped items ] --- \\
 function updateEquipped(){
@@ -204,7 +206,6 @@ function equip(id){
 
 
 function unequip(slot){
-    console.log(stats.equipped[slot]);
     const item = stats.equipped[slot];
     stats.inventory.push(item);
     stats.equipped[slot] = null;
@@ -226,7 +227,7 @@ const saveClient = () => {
 function attack(){
     var statsTotal = addStats();
     var passE = Math.floor(statsTotal[0] - statsTotal[0] * (stats.currentEnemy.defense / (stats.currentEnemy.defense + 100)));
-    var passP = Math.floor(stats.currentEnemy.defense - stats.currentEnemy.defense * (statsTotal[0] / (statsTotal[0] + 100)));
+    var passP = Math.floor(stats.currentEnemy.atack - stats.currentEnemy.attack * (statsTotal[0] / (statsTotal[0] + 100)));
     stats.currentEnemy.health -= passE;
     stats.health -= passP;
 }

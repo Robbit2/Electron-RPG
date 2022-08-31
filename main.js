@@ -30,19 +30,7 @@ const save = (data) => {
       });
 };
 
-ipcMain.on('save', function(event,arg){
-    save(arg);
-})
-
-ipcMain.on('death', function(event,arg){
-    dialog.showErrorBox("💀 YOU DIED 💀",`You died to a ${arg}`);
-})
-
-ipcMain.on("killed",function(event,arg){
-    dialog.showMessageBox({title:"⚔ You killed a monster ⚔",message:`You killed a ${arg}`,buttonLabel:"EPIC!",type:"info"});
-})
-
-const createWindow = () => {
+app.whenReady().then(() => {
     win = new BrowserWindow({
         width: 1600,
         height: 900,
@@ -55,6 +43,30 @@ const createWindow = () => {
 
     win.loadFile('index.html');
     //win.removeMenu();
-};
 
-app.whenReady().then(createWindow);
+    ipcMain.on('save', function(event,arg){
+        save(arg);
+    })
+
+    ipcMain.on('death', function(event,arg){
+        dialog.showErrorBox("💀 YOU DIED 💀",`You died to a ${arg}`);
+    })
+
+    ipcMain.on("killed",function(event,arg){
+        dialog.showMessageBox({title:"⚔ You killed a monster ⚔",message:`You killed a ${arg}`,type:"info",buttons:["EPIC!"]}).then((result) => {
+            if(result.response !== 0){return;}
+            if(result.response === 0){
+                win.webContents.on('did-finish-load', () => {
+                    win.webContents.send('xpBox')
+                })
+            }
+        })
+    })
+
+    ipcMain.on("gotXP",function(event, arg){
+        dialog.showMessageBox({title:"You got XP",message:`You got ${arg}XP`,type:"info",buttons:["EPIC!"]}).then((result) => {
+            if(result.response !== 0){return;}
+        })
+    })
+    
+});
