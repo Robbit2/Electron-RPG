@@ -8,7 +8,7 @@ var stats = {
     maxHealth: 100,
     attack : 5,
     defense : 5,
-    level: 0,
+    level: 1,
     xp: 0,
     inventory : [{name:"Stick",img:"./img/items/weapons/swords/stick.png",id:"weapon:stick",atk:5,def:0,type:"weapon",rarity:"#a8a8a8",level:1,gilded:false},{name:"Wooden Helmet",img:"./img/items/armor/wooden_helmet.png",id:"armor:wooden_helmet",atk:0,def:5,type:"armor.helmet",rarity:"#a8a8a8",level:1,gilded:false}],
     equipped : {
@@ -78,8 +78,8 @@ function getExp(){
     }if(cl >= 121){
         xpEarned = 350000 + (5*cl);
     }
-    
-    return xpEarned;
+    var xpReq = ((8 * cl) + (8 * (cl - 1)));
+    return [xpEarned, xpReq];
 }
 
 function renderEnemy(){
@@ -160,7 +160,8 @@ function updateHealth(){
     const eHPTxt = document.querySelector("#ehpTxt");
     setInterval(() => {
         var _stats = addStats();
-        healthBar.value = stats.health;
+        var health = stats.health;
+        healthBar.value = health;
         if(stats.health <= 0 && stats.dead == false){
             ipc.send("death",stats.currentEnemy.name());
             stats.dead = true;
@@ -227,7 +228,7 @@ const saveClient = () => {
 function attack(){
     var statsTotal = addStats();
     var passE = Math.floor(statsTotal[0] - statsTotal[0] * (stats.currentEnemy.defense / (stats.currentEnemy.defense + 100)));
-    var passP = Math.floor(stats.currentEnemy.atack - stats.currentEnemy.attack * (statsTotal[0] / (statsTotal[0] + 100)));
+    var passP = Math.floor(stats.currentEnemy.attack - stats.currentEnemy.attack * (statsTotal[0] / (statsTotal[0] + 100)));
     stats.currentEnemy.health -= passE;
     stats.health -= passP;
 }
