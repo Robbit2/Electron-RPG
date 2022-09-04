@@ -10,7 +10,7 @@ var stats = {
     defense : 5,
     level: 1,
     xp: 0,
-    inventory : [{name:"Stick",img:"./img/items/weapons/swords/stick.png",id:"weapon:stick",atk:5,def:0,type:"weapon",rarity:"#a8a8a8",level:1,gilded:false},{name:"Wooden Helmet",img:"./img/items/armor/wooden_helmet.png",id:"armor:wooden_helmet",atk:0,def:5,type:"armor.helmet",rarity:"#a8a8a8",level:1,gilded:false}],
+    inventory : [{name:"Stick",img:"./img/items/weapons/swords/stick.png",id:"weapon:stick",atk:5,def:0,type:"weapon",rarity:"#a8a8a8",level:1,gilded:false},{name:"Wooden Helmet",img:"./img/items/armor/wooden_helmet.png",id:"armor:wooden_helmet",atk:0,def:5,type:"armor.helmet",rarity:"#a8a8a8",level:1,gilded:false},{name:"Wooden Chestplate",img:"./img/items/armor/wooden_chestplate.png",id:"armor:wooden_chestplate",atk:0,def:8,type:"armor.chest",rarity:"#a8a8a8",level:1,gilded:false}],
     equipped : {
         head : null,
         chest : null,
@@ -47,10 +47,22 @@ function updateInventory(){
     }
 }
 
+function xpReq(){
+    var cl = stats.level;
+    var xpReqInt = cl*(cl-1)*250;
+    return xpReqInt;
+}
+
+function levelUp(){
+    stats.xp = 0;
+    stats.level += 1;
+    ipc.send('gotXP',xp);
+}
 
 function getExp(){
-    var cl = stats.level;
     var xpEarned = 0;
+    var cl = stats.level;
+    var xpReqInt = cl*(cl-1)*250;
     if(cl <= 10){
         xpEarned = 50 + (5*cl);
     }if(cl >= 11 && cl <= 20){
@@ -78,8 +90,11 @@ function getExp(){
     }if(cl >= 121){
         xpEarned = 350000 + (5*cl);
     }
-    var xpReq = ((8 * cl) + (8 * (cl - 1)));
-    return [xpEarned, xpReq];
+    stats.xp += xpEarned;
+    if(stats.xp >= xpReqInt){
+        levelUp();
+    }
+    return xpEarned;
 }
 
 function renderEnemy(){
@@ -97,6 +112,7 @@ function renderEnemy(){
         if(stats.currentEnemy.health <= 0){
             ipc.send('killed',stats.currentEnemy.name());
             stats.currentEnemy = null;
+            getExp();
             chooseEnemy();
         }
     },100)
@@ -158,6 +174,8 @@ function updateHealth(){
     const defenseTxt = document.querySelector("#defenseTxt");
     const attackTxt = document.querySelector("#attackTxt");
     const eHPTxt = document.querySelector("#ehpTxt");
+    const xpTxt = document.querySelector("#xp");
+    const lvlTxt = document.querySelector("#level");
     setInterval(() => {
         var _stats = addStats();
         var health = stats.health;
@@ -175,6 +193,8 @@ function updateHealth(){
         defenseTxt.innerHTML = `🛡️ Defense: ${_stats[1]}`;
         attackTxt.innerHTML = `⚔️ Attack: ${_stats[0]}`;
         eHPTxt.innerHTML = `💚 Effective Health: ${eHP()}`;
+        xpTxt.innerHTML = `⚗️ XP: ${stats.xp}/${xpReq()}`;
+        lvlTxt.innerHTML = `🏅 Level: ${stats.level}`;
     },100)
 }
 
@@ -198,6 +218,46 @@ function equip(id){
             const _item = stats.equipped.head;
             stats.inventory.push(_item);
             stats.equipped.head = item;
+            stats.inventory.splice(id,1);
+        }
+    }if(item.type == "armor.chest"){
+        if(stats.equipped.chest == null){
+            stats.equipped.chest = item;
+            stats.inventory.splice(id,1);
+        }else{
+            const _item = stats.equipped.chest;
+            stats.inventory.push(_item);
+            stats.equipped.chest = item;
+            stats.inventory.splice(id,1);
+        }
+    }if(item.type == "armor.legs"){
+        if(stats.equipped.legs == null){
+            stats.equipped.legs = item;
+            stats.inventory.splice(id,1);
+        }else{
+            const _item = stats.equipped.legs;
+            stats.inventory.push(_item);
+            stats.equipped.legs = item;
+            stats.inventory.splice(id,1);
+        }
+    }if(item.type == "accessory.1"){
+        if(stats.equipped.accessory_1 == null){
+            stats.equipped.accessory_1 = item;
+            stats.inventory.splice(id,1);
+        }else{
+            const _item = stats.equipped.accessory_1;
+            stats.inventory.push(_item);
+            stats.equipped.accessory_1 = item;
+            stats.inventory.splice(id,1);
+        }
+    }if(item.type == "accessory.2"){
+        if(stats.equipped.accessory_2 == null){
+            stats.equipped.accessory_2 = item;
+            stats.inventory.splice(id,1);
+        }else{
+            const _item = stats.equipped.accessory_2;
+            stats.inventory.push(_item);
+            stats.equipped.accessory_2 = item;
             stats.inventory.splice(id,1);
         }
     }
