@@ -53,10 +53,46 @@ function xpReq(){
     return xpReqInt;
 }
 
+function xpText(amount){
+    var txtDom = document.createElement("span");
+    document.querySelector("#xpTexts").appendChild(txtDom);
+    var height = window.innerHeight;
+    var width = window.innerWidth;
+    var x = Math.floor(Math.random()*width);
+    var y = Math.floor(Math.random()*height);
+    var opac = 100;
+    txtDom.innerHTML = `+${amount}XP`;
+    txtDom.style.color = "lime";
+    txtDom.style.position = "absolute";
+    txtDom.style.top = `${y}px`;
+    txtDom.style.left = `${x}px`;
+    var e = setInterval(() => {
+        y -= 5;
+        opac -= 1;
+        txtDom.style.top = `${y}px`;
+    },50);
+    setTimeout(() => {
+        clearInterval(e);
+        setTimeout(() => {txtDom.style.opacity = "0.9";}, 100);
+        setTimeout(() => {txtDom.style.opacity = "0.8";}, 200);
+        setTimeout(() => {txtDom.style.opacity = "0.7";}, 300);
+        setTimeout(() => {txtDom.style.opacity = "0.6";}, 400);
+        setTimeout(() => {txtDom.style.opacity = "0.5";}, 500);
+        setTimeout(() => {txtDom.style.opacity = "0.4";}, 600);
+        setTimeout(() => {txtDom.style.opacity = "0.3";}, 700);
+        setTimeout(() => {txtDom.style.opacity = "0.2";}, 800);
+        setTimeout(() => {txtDom.style.opacity = "0.1";}, 900);
+        setTimeout(() => {
+            txtDom.remove();
+        },1000)
+    },1500);
+}
+
 function levelUp(){
     stats.xp = 0;
     stats.level += 1;
-    ipc.send('gotXP',xp);
+    stats.maxHealth = Math.ceil(stats.maxHealth * 1.15);
+    stats.health = stats.maxHealth;
 }
 
 function getExp(){
@@ -92,8 +128,9 @@ function getExp(){
     }
     stats.xp += xpEarned;
     if(stats.xp >= xpReqInt){
-        levelUp();
+        levelUp(xpEarned);
     }
+    xpText(xpEarned);
     return xpEarned;
 }
 
