@@ -54,12 +54,16 @@ function updateInventory(){
     }
 }
 
+
+// --- [ Returns the xp required to level up ] --- \\
 function xpReq(){
     var cl = stats.level;
     var xpReqInt = cl*(cl-1)*250;
     return xpReqInt;
 }
 
+
+// --- [ creates the floating xp text ] --- \\
 function xpText(amount){
     var txtDom = document.createElement("span");
     document.querySelector("#xpTexts").appendChild(txtDom);
@@ -95,6 +99,8 @@ function xpText(amount){
     },1500);
 }
 
+
+// --- [ changes stats ] --- \\
 function levelUp(){
     stats.xp = 0;
     stats.level += 1;
@@ -102,6 +108,8 @@ function levelUp(){
     stats.health = stats.maxHealth;
 }
 
+
+// --- [ applies xp from monster kill ] --- \\
 function getExp(){
     var xpEarned = 0;
     var cl = stats.level;
@@ -141,6 +149,8 @@ function getExp(){
     return xpEarned;
 }
 
+
+// --- [ renders enemy, such as the health and attack ] --- \\
 function renderEnemy(){
     const enemyhpDOM = document.querySelector("#enemy-health");
     const enemydefDOM = document.querySelector("#enemy-defense");
@@ -162,11 +172,6 @@ function renderEnemy(){
     },100)
 }
 
-ipc.on("xpBox", function(event){
-    let xp = getExp();
-    ipc.send('gotXP',xp);
-    console.log(xp);
-})
 
 // --- [ Updates the player's equipped items ] --- \\
 function updateEquipped(){
