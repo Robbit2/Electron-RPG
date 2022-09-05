@@ -2,7 +2,14 @@ const electron = require('electron');
 const remote = electron.remote;
 const ipc = electron.ipcRenderer;
 const items = require("./item_db");
-const enemies = require("./enemies")
+const enemies = require("./enemies");
+
+
+// --- [ Audio Sources ] --- \\
+const eatSound = new Audio("./audio/eat.wav");
+const hitSound = new Audio("./audio/hit.wav");
+hitSound.volume = 0.5;
+
 var stats = {
     health : 100, 
     maxHealth: 100,
@@ -10,7 +17,7 @@ var stats = {
     defense : 5,
     level: 1,
     xp: 0,
-    inventory : [{name:"Stick",img:"./img/items/weapons/swords/stick.png",id:"weapon:stick",atk:5,def:0,type:"weapon",rarity:"#a8a8a8",level:1,gilded:false},{name:"Wooden Helmet",img:"./img/items/armor/wooden_helmet.png",id:"armor:wooden_helmet",atk:0,def:5,type:"armor.helmet",rarity:"#a8a8a8",level:1,gilded:false},{name:"Wooden Chestplate",img:"./img/items/armor/wooden_chestplate.png",id:"armor:wooden_chestplate",atk:0,def:8,type:"armor.chest",rarity:"#a8a8a8",level:1,gilded:false}],
+    inventory : [{name:"Stick",img:"./img/items/weapons/swords/stick.png",id:"weapon:stick",atk:5,def:0,type:"weapon",rarity:"#a8a8a8",level:1,gilded:false},{name:"Wooden Helmet",img:"./img/items/armor/wooden_helmet.png",id:"armor:wooden_helmet",atk:0,def:5,type:"armor.helmet",rarity:"#a8a8a8",level:1,gilded:false},{name:"Wooden Chestplate",img:"./img/items/armor/wooden_chestplate.png",id:"armor:wooden_chestplate",atk:0,def:8,type:"armor.chest",rarity:"#a8a8a8",level:1,gilded:false},{name:"Apple",img:"./img/items/consumables/apple.png",id:"consumable:apple",atk:0,def:0,type:"consumable.heal",rarity:"#a8a8a8",level:1,gilded:false,healVal:10}],
     equipped : {
         head : null,
         chest : null,
@@ -232,6 +239,11 @@ function updateHealth(){
         eHPTxt.innerHTML = `💚 Effective Health: ${eHP()}`;
         xpTxt.innerHTML = `⚗️ XP: ${stats.xp}/${xpReq()}`;
         lvlTxt.innerHTML = `🏅 Level: ${stats.level}`;
+        if(stats.health > stats.maxHealth){
+            stats.health = stats.maxHealth;
+        }if(stats.health <= 0){
+            stats.health = 0;
+        }
     },100)
 }
 
@@ -297,6 +309,10 @@ function equip(id){
             stats.equipped.accessory_2 = item;
             stats.inventory.splice(id,1);
         }
+    }if(item.type == "consumable.heal"){
+        stats.inventory.splice(id,1);
+        stats.health += item.healVal;
+        eatSound.play();
     }
     updateEquipped();
     updateInventory();
@@ -323,11 +339,14 @@ const saveClient = () => {
 };
 
 function attack(){
+    hitSound.pause();
+    hitSound.currentTime = 0;
     var statsTotal = addStats();
     var passE = Math.floor(statsTotal[0] - statsTotal[0] * (stats.currentEnemy.defense / (stats.currentEnemy.defense + 100)));
     var passP = Math.floor(stats.currentEnemy.attack - stats.currentEnemy.attack * (statsTotal[0] / (statsTotal[0] + 100)));
     stats.currentEnemy.health -= passE;
     stats.health -= passP;
+    hitSound.play();
 }
 
 updateEquipped();
