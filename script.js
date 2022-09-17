@@ -18,7 +18,7 @@ var stats = {
     defense : 5,
     level: 1,
     xp: 0,
-    inventory : [{name:"Stick",img:"./img/items/weapons/swords/stick.png",id:"weapon:stick",atk:5,def:0,type:"weapon",rarity:"#a8a8a8",level:1,gilded:false,"stars":"✪✪✪✪✪","reforge":"Spicy"}],
+    inventory : [{name:"Stick",img:"./img/items/weapons/swords/stick.png",id:"weapon:stick",atk:5,def:0,type:"weapon",rarity:"#a8a8a8",level:1,gilded:false,"stars":"✪✪✪✪✪","reforge":"Spicy"},{name:"Bunny Mask",img:"./img/items/accessories/bunny_mask.png",id:"accessory:bunny_mask",atk:5,def:5,type:"accessory.2",rarity:"#a8a8a8",level:2,gilded:false,stars:"",reforge:""}],
     equipped : {
         head : null,
         chest : null,
