@@ -16,7 +16,8 @@
         <span id="attackTxt">⚔️ Attack: 5</span><br>
         <span id="ehpTxt">💚 Effective Health: 105</span><br>
         <span id="xp">⚗️ XP: 0/250</span><br>
-        <span id="level">🏅 Level: 1</span>
+        <span id="level">🏅 Level: 1</span><br>
+        <span id="coins">Coins: <span id="coins.gold" style="color:gold;">0</span> / <span id="coins.silver" style="color:silver;">0</span> / <span id="coins.copper" style="color:orange;">10</span></span>
         <br>
         <button id="savebtn">Save</button><button id="loadbtn">Load</button>
     </div>
@@ -41,9 +42,16 @@
                 <span class="tooltiptext">Empty</span>
             </div>
         </div>
+        <div id="forge">
+            <h3>The Forge</h3>
+            <div id="forge-item">
+
+            </div>
+            <button id=" onclick="levelUp()">Level Up Item</button>
+        </div>
         <div id="enemy">
             <button id="enemy-attack" onclick="attack()">Attack</button>
-            <div style="float:right;">
+            <div style="width:50%;margin:auto;">
                 <h3 id="enemy-name">Enemy</h3>
                 <img src="./img/ui/blank_person.png" height="128px" width="128px" id="enemy-img"><br>
                 <span id="enemy-health">❤️ Health: 100</span><br>

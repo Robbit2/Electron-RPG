@@ -7,7 +7,8 @@
 - [x] Added Death
 - [x] Added Consumables
 ## Alpha 0.3.0a
-- [ ] Added items for all inventory slots
+- [x] Added items for all inventory slots
+- [x] Started the forge
 - [ ] Added zone 2 enemies
 ## Alpha 0.5.0a
 - [ ] Added the ability to create bosses (as a dev)

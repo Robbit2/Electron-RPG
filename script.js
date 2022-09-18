@@ -27,6 +27,7 @@ var stats = {
         accessory_2 : null,
         weapon : null
     },
+    forge: null,
     attacking: false,
     currentEnemy: null,
     dead: false
@@ -51,8 +52,23 @@ function updateInventory(){
     const invDOM = document.querySelector("#inventory");
     invDOM.innerHTML = "";
     for(_ in stats.inventory){
-        invDOM.innerHTML += `<div class="tooltip" onclick="equip(${_});" style="height:64px;width:64px;background-color:${stats.inventory[_].rarity};background-image:url(${stats.inventory[_].img});background-size: cover;border:4px solid rgb(92, 91, 91);"><span class="tooltiptext">[Lv.${stats.inventory[_].level}] <b>${stats.inventory[_].reforge}</b> ${stats.inventory[_].name} ${stats.inventory[_].stars}</span></div>`;
+        invDOM.innerHTML += `<div class="tooltip" onclick="equip(${_});" style="height:64px;width:64px;background-color:${stats.inventory[_].rarity};background-image:url(${stats.inventory[_].img});background-size: cover;border:4px solid rgb(92, 91, 91);" oncontextmenu="inForge(${_})"><span class="tooltiptext">[Lv.${stats.inventory[_].level}] <b>${stats.inventory[_].reforge}</b> ${stats.inventory[_].name} ${stats.inventory[_].stars}</span></div>`;
     }
+}
+
+
+function inForge(id){
+    console.warn(id)
+    if(stats.forge == null){
+        stats.forge = stats.inventory[id];
+        stats.inventory.splice(id,1);
+    }else{
+        stats.inventory.push(stats.forge);
+        stats.forge = stats.inventory[id];
+        stats.inventory.splice(id,1);
+    }
+    updateForge();
+    updateInventory();
 }
 
 
@@ -179,16 +195,32 @@ function renderEnemy(){
 }
 
 
+function updateForge(){
+    if(stats.forge == null){
+        let forgeDOM = `#forge-item`;
+        document.querySelector(forgeDOM).innerHTML = ``;
+        document.querySelector(forgeDOM).style.background = `url("./img/ui/forge_item_slot.png")`;
+        document.querySelector(forgeDOM).style.backgroundSize = "cover";
+    }else{
+        let forgeDOM = `#forge-item`;
+        document.querySelector(forgeDOM).innerHTML = `<div class="tooltipforge" onclick="unequip('${stats.forge}')" style="height:128px;width:128px;background-image:url(${stats.forge.img});background-size: cover;"><span class="tooltiptextforge">[Lv.${stats.forge.level}] <b>${stats.forge.reforge}</b> ${stats.forge.name} ${stats.forge.stars}<br>⚔️ Attack: ${stats.forge.atk}<br>🛡️ Defense: ${stats.forge.def}</span></div>`;
+        document.querySelector(forgeDOM).style.background = stats.forge.rarity;
+    }
+}
+
+
 // --- [ Updates the player's equipped items ] --- \\
 function updateEquipped(){
     for(_ in stats.equipped){
         if(stats.equipped[_] == null){
             let itemDOM = `#${_}`;
+            console.log(itemDOM);
             document.querySelector(itemDOM).innerHTML = ``;
             document.querySelector(itemDOM).style.background = `url("./img/ui/${_}_slot.png")`;
             document.querySelector(itemDOM).style.backgroundSize = "cover";
         }else{
             let itemDOM = `#${_}`;
+            console.log(itemDOM);
             document.querySelector(itemDOM).innerHTML = `<div class="tooltip" onclick="unequip('${_}')" style="height:64px;width:64px;background-image:url(${stats.equipped[_].img});background-size: cover;"><span class="tooltiptext">[Lv.${stats.equipped[_].level}] <b>${stats.equipped[_].reforge}</b> ${stats.equipped[_].name} ${stats.equipped[_].stars}<br>⚔️ Attack: ${stats.equipped[_].atk}<br>🛡️ Defense: ${stats.equipped[_].def}</span></div>`;
             document.querySelector(itemDOM).style.background = stats.equipped[_].rarity;
         }
@@ -330,12 +362,20 @@ function equip(id){
 }
 
 
-function unequip(slot){
-    const item = stats.equipped[slot];
-    stats.inventory.push(item);
-    stats.equipped[slot] = null;
-    updateEquipped();
-    updateInventory();
+function unequip(slot,spot){
+    if(spot == "equipped"){
+        const item = stats.equipped[slot];
+        stats.inventory.push(item);
+        stats.equipped[slot] = null;
+        updateEquipped();
+        updateInventory();
+    }else{
+        const item = stats.forge;
+        stats.inventory.push(item)
+        stats.forge = null;
+        updateForge();
+        updateInventory();
+    }
 }
 
 // --- [ Runs saveClient on button click ] --- \\
