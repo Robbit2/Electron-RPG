@@ -18,7 +18,7 @@ var stats = {
     defense : 5,
     level: 1,
     xp: 0,
-    inventory : [{name:"Stick",img:"./img/items/weapons/swords/stick.png",id:"weapon:stick",atk:5,def:0,type:"weapon",rarity:"#a8a8a8",level:1,gilded:false,"stars":"✪✪✪✪✪","reforge":"Spicy"},{name:"Bunny Mask",img:"./img/items/accessories/bunny_mask.png",id:"accessory:bunny_mask",atk:5,def:5,type:"accessory.2",rarity:"#a8a8a8",level:2,gilded:false,stars:"",reforge:""}],
+    inventory : [{name:"Stick",img:"./img/items/weapons/swords/stick.png",id:"weapon:stick",atk:5,def:0,type:"weapon",rarity:"#a8a8a8",level:1,gilded:false,"stars":"✪✪✪✪✪","reforge":"Spicy",atkBuff:10,defBuff:100},{name:"Bunny Mask",img:"./img/items/accessories/bunny_mask.png",id:"accessory:bunny_mask",atk:5,def:5,type:"accessory.2",rarity:"#a8a8a8",level:100,gilded:true,stars:"",reforge:"",atkBuff:10,defBuff:10},{name:"Fallen Star",img:"./img/items/fallen_star.png",id:"item:fallen_star",atk:5,def:5,type:"item",rarity:"#a8a8a8",level:2,gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0}],
     equipped : {
         head : null,
         chest : null,
@@ -27,21 +27,28 @@ var stats = {
         accessory_2 : null,
         weapon : null
     },
-    forge: null,
+    forge : null,
+    money : {
+        gold : 0,
+        silver : 0,
+        copper : 10
+    },
     attacking: false,
     currentEnemy: null,
     dead: false
 };
 
 
+var area1Loot = [[{name:"Stick",img:"./img/items/weapons/swords/stick.png",id:"weapon:stick",atk:5,def:0,type:"weapon",rarity:"#a8a8a8",level:1,gilded:false,"stars":"","reforge":"",atkBuff:0,defBuff:0},75],[{name:"Wooden Chestplate",img:"./img/items/armor/wooden_chestplate.png",id:"armor:wooden_chestplate",atk:0,def:8,type:"armor.chest",rarity:"#a8a8a8",level:1,gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0},25]]
+
 function chooseEnemy(){
     if(stats.currentEnemy == null){
         if(stats.level <= 10){
             let randInt = Math.floor(Math.random()* 2);
             if(randInt == 0){
-                stats.currentEnemy = new enemies.large_rat(Math.ceil(Math.random()*10),Math.ceil(Math.random()*100),Math.ceil(Math.random()*10),Math.ceil(Math.random()*10));
+                stats.currentEnemy = new enemies.large_rat(Math.ceil(Math.random()*10),Math.ceil(Math.random()*100),Math.ceil(Math.random()*10),Math.ceil(Math.random()*10),area1Loot);
             }else{
-                stats.currentEnemy = new enemies.slime(Math.ceil(Math.random()*10),Math.ceil(Math.random()*100),Math.ceil(Math.random()*10),Math.ceil(Math.random()*10));
+                stats.currentEnemy = new enemies.slime(Math.ceil(Math.random()*10),Math.ceil(Math.random()*100),Math.ceil(Math.random()*10),Math.ceil(Math.random()*10),area1Loot);
             }
         }
     }else{}
@@ -58,7 +65,6 @@ function updateInventory(){
 
 
 function inForge(id){
-    console.warn(id)
     if(stats.forge == null){
         stats.forge = stats.inventory[id];
         stats.inventory.splice(id,1);
@@ -118,7 +124,7 @@ function xpText(amount){
 
 
 function lootFromTable(table){
-    return;
+    return table;
 }
 
 
@@ -187,6 +193,7 @@ function renderEnemy(){
         enemyName.innerHTML = stats.currentEnemy.name();
         if(stats.currentEnemy.health <= 0){
             ipc.send('killed',stats.currentEnemy.name());
+            lootFromTable(stats.currentEnemy.getStats()[5]);
             stats.currentEnemy = null;
             getExp();
             chooseEnemy();
@@ -201,28 +208,104 @@ function updateForge(){
         document.querySelector(forgeDOM).innerHTML = ``;
         document.querySelector(forgeDOM).style.background = `url("./img/ui/forge_item_slot.png")`;
         document.querySelector(forgeDOM).style.backgroundSize = "cover";
+        document.querySelector("#lvlUpBtn").innerHTML = `Level Up Item (100 Copper)`;
     }else{
+        let lvlUpCost = stats.forge.level*(stats.forge.level-1)*100;
         let forgeDOM = `#forge-item`;
-        document.querySelector(forgeDOM).innerHTML = `<div class="tooltipforge" onclick="unequip('${stats.forge}')" style="height:128px;width:128px;background-image:url(${stats.forge.img});background-size: cover;"><span class="tooltiptextforge">[Lv.${stats.forge.level}] <b>${stats.forge.reforge}</b> ${stats.forge.name} ${stats.forge.stars}<br>⚔️ Attack: ${stats.forge.atk}<br>🛡️ Defense: ${stats.forge.def}</span></div>`;
-        document.querySelector(forgeDOM).style.background = stats.forge.rarity;
+        if(stats.forge.atkBuff > 0){
+            document.querySelector(forgeDOM).innerHTML = `<div class="tooltipforge" onclick="unequip('${stats.forge}')" style="height:128px;width:128px;background-image:url(${stats.forge.img});background-size: cover;"><span class="tooltiptextforge">[Lv.${stats.forge.level}] <b>${stats.forge.reforge}</b> ${stats.forge.name} ${stats.forge.stars}<br>⚔️ Attack: ${stats.forge.atk + stats.forge.atkBuff} (+${stats.forge.atkBuff})<br>🛡️ Defense: ${stats.forge.def}</span></div>`;
+            document.querySelector(forgeDOM).style.background = stats.forge.rarity;
+        }else if(stats.forge.defBuff > 0){
+            document.querySelector(forgeDOM).innerHTML = `<div class="tooltipforge" onclick="unequip('${stats.forge}')" style="height:128px;width:128px;background-image:url(${stats.forge.img});background-size: cover;"><span class="tooltiptextforge">[Lv.${stats.forge.level}] <b>${stats.forge.reforge}</b> ${stats.forge.name} ${stats.forge.stars}<br>⚔️ Attack: ${stats.forge.atk}<br>🛡️ Defense: ${stats.forge.def + stats.forge.defBuff} (+${stats.forge.defBuff})</span></div>`;
+            document.querySelector(forgeDOM).style.background = stats.forge.rarity;
+        }else if(stats.forge.defBuff > 0 && stats.forge.atkBuff > 0){
+            document.querySelector(forgeDOM).innerHTML = `<div class="tooltipforge" onclick="unequip('${stats.forge}')" style="height:128px;width:128px;background-image:url(${stats.forge.img});background-size: cover;"><span class="tooltiptextforge">[Lv.${stats.forge.level}] <b>${stats.forge.reforge}</b> ${stats.forge.name} ${stats.forge.stars}<br>⚔️ Attack: ${stats.forge.atk + stats.forge.atkBuff} (+${stats.forge.atkBuff})<br>🛡️ Defense: ${stats.forge.def + stats.forge.defBuff} (+${stats.forge.defBuff})</span></div>`;
+            document.querySelector(forgeDOM).style.background = stats.forge.rarity;
+        }else{
+            document.querySelector(forgeDOM).innerHTML = `<div class="tooltipforge" onclick="unequip('${stats.forge}')" style="height:128px;width:128px;background-image:url(${stats.forge.img});background-size: cover;"><span class="tooltiptextforge">[Lv.${stats.forge.level}] <b>${stats.forge.reforge}</b> ${stats.forge.name} ${stats.forge.stars}<br>⚔️ Attack: ${stats.forge.atk}<br>🛡️ Defense: ${stats.forge.def}</span></div>`;
+            document.querySelector(forgeDOM).style.background = stats.forge.rarity;
+        }
+        if(stats.forge.level < 100){
+            document.getElementById("lvlUpBtn").disabled = false;
+            if(stats.forge.level <= 30){
+                document.querySelector("#lvlUpBtn").innerHTML = `Level Up Item (${lvlUpCost} Copper)`;
+            }if(stats.forge.level > 30 && stats.forge.level <= 60){
+                document.querySelector("#lvlUpBtn").innerHTML = `Level Up Item (${lvlUpCost} Silver)`;
+            }if(stats.forge.level > 60 && stats.forge.level <= 100){
+                document.querySelector("#lvlUpBtn").innerHTML = `Level Up Item (${lvlUpCost} Gold)`;
+            }
+        }else{
+            document.querySelector("#lvlUpBtn").innerHTML = `Item Is Max Level`;
+            document.getElementById("lvlUpBtn").disabled = true;
+        }
     }
 }
 
+
+function levelUpItem(){
+    let costType = "copper";
+    if(stats.forge.level <= 30){
+        costType = "copper";
+    }if(stats.forge.level > 30 && stats.forge.level <= 60){
+        ostType = "silver";
+    }if(stats.forge.level > 60 && stats.forge.level <= 100){
+        costType = "gold";
+    }
+    let levelCost = stats.forge.level*(stats.forge.level-1)*100;
+    if(stats.money[costType] >= levelCost){
+        stats.money[costType] -= levelCost;
+        stats.forge.level += 1;
+    }else{
+        alert(`Not enough ${costType}`);
+    }
+}
+
+
+function Masterforge(){
+    alert("masterforging is being implemented");
+}
+
+
+function addStar(){
+    if(stats.forge.stars.length < 5){
+        for(_ in stats.inventory){
+            if(stats.inventory[_].name == "Fallen Star"){
+                if(stats.forge.gilded == true){
+                    stats.forge.stars += "✪";
+                    updateForge()
+                }else{
+                    alert("Item must be masterforged!")
+                }
+            }
+        }
+    }else{
+        alert("Item already has 5 stars!")
+    }
+}
 
 // --- [ Updates the player's equipped items ] --- \\
 function updateEquipped(){
     for(_ in stats.equipped){
         if(stats.equipped[_] == null){
             let itemDOM = `#${_}`;
-            console.log(itemDOM);
             document.querySelector(itemDOM).innerHTML = ``;
             document.querySelector(itemDOM).style.background = `url("./img/ui/${_}_slot.png")`;
             document.querySelector(itemDOM).style.backgroundSize = "cover";
         }else{
             let itemDOM = `#${_}`;
-            console.log(itemDOM);
-            document.querySelector(itemDOM).innerHTML = `<div class="tooltip" onclick="unequip('${_}')" style="height:64px;width:64px;background-image:url(${stats.equipped[_].img});background-size: cover;"><span class="tooltiptext">[Lv.${stats.equipped[_].level}] <b>${stats.equipped[_].reforge}</b> ${stats.equipped[_].name} ${stats.equipped[_].stars}<br>⚔️ Attack: ${stats.equipped[_].atk}<br>🛡️ Defense: ${stats.equipped[_].def}</span></div>`;
-            document.querySelector(itemDOM).style.background = stats.equipped[_].rarity;
+            if(stats.equipped[_].atkBuff > 0){
+                document.querySelector(itemDOM).innerHTML = `<div class="tooltip" onclick="unequip('${_}','equipped')" style="height:64px;width:64px;background-image:url(${stats.equipped[_].img});background-size: cover;"><span class="tooltiptext">[Lv.${stats.equipped[_].level}] <b>${stats.equipped[_].reforge}</b> ${stats.equipped[_].name} ${stats.equipped[_].stars}<br>⚔️ Attack: ${stats.equipped[_].atk + stats.equipped[_].atkBuff} (+${stats.equipped[_].atkBuff})<br>🛡️ Defense: ${stats.equipped[_].def}</span></div>`;
+                document.querySelector(itemDOM).style.background = stats.equipped[_].rarity;
+            }else if(stats.equipped[_].defBuff > 0){
+                document.querySelector(itemDOM).innerHTML = `<div class="tooltip" onclick="unequip('${_}','equipped')" style="height:64px;width:64px;background-image:url(${stats.equipped[_].img});background-size: cover;"><span class="tooltiptext">[Lv.${stats.equipped[_].level}] <b>${stats.equipped[_].reforge}</b> ${stats.equipped[_].name} ${stats.equipped[_].stars}<br>⚔️ Attack: ${stats.equipped[_].atk}<br>🛡️ Defense: ${stats.equipped[_].def + stats.equipped[_].defBuff} (+${stats.equipped[_].defBuff})</span></div>`;
+                document.querySelector(itemDOM).style.background = stats.equipped[_].rarity;
+            }else if(stats.equipped[_].atkBuff > 0 && stats.equipped[_].defBuff > 0){
+                document.querySelector(itemDOM).innerHTML = `<div class="tooltip" onclick="unequip('${_}','equipped')" style="height:64px;width:64px;background-image:url(${stats.equipped[_].img});background-size: cover;"><span class="tooltiptext">[Lv.${stats.equipped[_].level}] <b>${stats.equipped[_].reforge}</b> ${stats.equipped[_].name} ${stats.equipped[_].stars}<br>⚔️ Attack: ${stats.equipped[_].atk + stats.equipped[_].atkBuff} (+${stats.equipped[_].atkBuff })<br>🛡️ Defense: ${stats.equipped[_].def + stats.equipped[_].defBuff} (+${stats.equipped[_].defBuff})</span></div>`;
+                document.querySelector(itemDOM).style.background = stats.equipped[_].rarity;
+            }else{
+                document.querySelector(itemDOM).innerHTML = `<div class="tooltip" onclick="unequip('${_}','equipped')" style="height:64px;width:64px;background-image:url(${stats.equipped[_].img});background-size: cover;"><span class="tooltiptext">[Lv.${stats.equipped[_].level}] <b>${stats.equipped[_].reforge}</b> ${stats.equipped[_].name} ${stats.equipped[_].stars}<br>⚔️ Attack: ${stats.equipped[_].atk}<br>🛡️ Defense: ${stats.equipped[_].def}</span></div>`;
+                document.querySelector(itemDOM).style.background = stats.equipped[_].rarity;
+            }
         }
     }
 };
@@ -250,6 +333,8 @@ function addStats(){
         if(stats.equipped[_] == null){}else{
             defense += stats.equipped[_].def;
             attack += stats.equipped[_].atk;
+            attack += stats.equipped[_].atkBuff;
+            defense += stats.equipped[_].defBuff;
         }
     }
     return [attack,defense];
@@ -398,6 +483,12 @@ function attack(){
     stats.currentEnemy.health -= passE;
     stats.health -= passP;
     hitSound.play();
+}
+
+function updateMoney(){
+    setInterval(() => {
+        document.querySelector("#coins").innerHTML = `Coins: <span id="coins.gold" style="color:gold;">${stats.money.gold}</span> / <span id="coins.silver" style="color:silver;">${stats.money.silver}</span> / <span id="coins.copper" style="color:orange;">${stats.money.copper}</span>`;
+    },250)
 }
 
 updateEquipped();
