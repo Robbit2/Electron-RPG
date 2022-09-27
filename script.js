@@ -125,7 +125,22 @@ function floatText(amount,text,color){
 
 
 function lootFromTable(table){
-    return table;
+    var num = Math.ceil(Math.random()*100);
+    var counter = 0;
+    for(_ in table){
+        var weight = table[_][1];
+        counter += weight;
+        if(num <= counter){
+            let pickItem = table[_][0];
+            alert(`You found a [Lv.${pickItem.level}] ${pickItem.reforge} ${pickItem.name} ${pickItem.stars}`);
+            stats.inventory.push(pickItem);
+            updateEquipped();
+            updateInventory();
+            updateForge();
+            break
+        }
+
+    }
 }
 
 
@@ -235,14 +250,14 @@ function updateForge(){
     }else{
         let lvlUpCost = stats.forge.level*(stats.forge.level-1)*100;
         let forgeDOM = `#forge-item`;
-        if(stats.forge.atkBuff > 0){
+        if(stats.forge.defBuff > 0 && stats.forge.atkBuff > 0){
+            document.querySelector(forgeDOM).innerHTML = `<div class="tooltipforge" onclick="unequip('${stats.forge}')" style="height:128px;width:128px;background-image:url(${stats.forge.img});background-size: cover;"><span class="tooltiptextforge">[Lv.${stats.forge.level}] <b>${stats.forge.reforge}</b> ${stats.forge.name} ${stats.forge.stars}<br>⚔️ Attack: ${stats.forge.atk + stats.forge.atkBuff} (+${stats.forge.atkBuff})<br>🛡️ Defense: ${stats.forge.def + stats.forge.defBuff} (+${stats.forge.defBuff})</span></div>`;
+            document.querySelector(forgeDOM).style.background = stats.forge.rarity;
+        }else if(stats.forge.atkBuff > 0){
             document.querySelector(forgeDOM).innerHTML = `<div class="tooltipforge" onclick="unequip('${stats.forge}')" style="height:128px;width:128px;background-image:url(${stats.forge.img});background-size: cover;"><span class="tooltiptextforge">[Lv.${stats.forge.level}] <b>${stats.forge.reforge}</b> ${stats.forge.name} ${stats.forge.stars}<br>⚔️ Attack: ${stats.forge.atk + stats.forge.atkBuff} (+${stats.forge.atkBuff})<br>🛡️ Defense: ${stats.forge.def}</span></div>`;
             document.querySelector(forgeDOM).style.background = stats.forge.rarity;
         }else if(stats.forge.defBuff > 0){
             document.querySelector(forgeDOM).innerHTML = `<div class="tooltipforge" onclick="unequip('${stats.forge}')" style="height:128px;width:128px;background-image:url(${stats.forge.img});background-size: cover;"><span class="tooltiptextforge">[Lv.${stats.forge.level}] <b>${stats.forge.reforge}</b> ${stats.forge.name} ${stats.forge.stars}<br>⚔️ Attack: ${stats.forge.atk}<br>🛡️ Defense: ${stats.forge.def + stats.forge.defBuff} (+${stats.forge.defBuff})</span></div>`;
-            document.querySelector(forgeDOM).style.background = stats.forge.rarity;
-        }else if(stats.forge.defBuff > 0 && stats.forge.atkBuff > 0){
-            document.querySelector(forgeDOM).innerHTML = `<div class="tooltipforge" onclick="unequip('${stats.forge}')" style="height:128px;width:128px;background-image:url(${stats.forge.img});background-size: cover;"><span class="tooltiptextforge">[Lv.${stats.forge.level}] <b>${stats.forge.reforge}</b> ${stats.forge.name} ${stats.forge.stars}<br>⚔️ Attack: ${stats.forge.atk + stats.forge.atkBuff} (+${stats.forge.atkBuff})<br>🛡️ Defense: ${stats.forge.def + stats.forge.defBuff} (+${stats.forge.defBuff})</span></div>`;
             document.querySelector(forgeDOM).style.background = stats.forge.rarity;
         }else{
             document.querySelector(forgeDOM).innerHTML = `<div class="tooltipforge" onclick="unequip('${stats.forge}')" style="height:128px;width:128px;background-image:url(${stats.forge.img});background-size: cover;"><span class="tooltiptextforge">[Lv.${stats.forge.level}] <b>${stats.forge.reforge}</b> ${stats.forge.name} ${stats.forge.stars}<br>⚔️ Attack: ${stats.forge.atk}<br>🛡️ Defense: ${stats.forge.def}</span></div>`;
@@ -343,14 +358,14 @@ function updateEquipped(){
             document.querySelector(itemDOM).style.backgroundSize = "cover";
         }else{
             let itemDOM = `#${_}`;
-            if(stats.equipped[_].atkBuff > 0){
+            if(stats.equipped[_].atkBuff > 0 && stats.equipped[_].defBuff > 0){
+                document.querySelector(itemDOM).innerHTML = `<div class="tooltip" onclick="unequip('${_}','equipped')" style="height:64px;width:64px;background-image:url(${stats.equipped[_].img});background-size: cover;"><span class="tooltiptext">[Lv.${stats.equipped[_].level}] <b>${stats.equipped[_].reforge}</b> ${stats.equipped[_].name} ${stats.equipped[_].stars}<br>⚔️ Attack: ${stats.equipped[_].atk + stats.equipped[_].atkBuff} (+${stats.equipped[_].atkBuff })<br>🛡️ Defense: ${stats.equipped[_].def + stats.equipped[_].defBuff} (+${stats.equipped[_].defBuff})</span></div>`;
+                document.querySelector(itemDOM).style.background = stats.equipped[_].rarity;
+            }else if(stats.equipped[_].atkBuff > 0){
                 document.querySelector(itemDOM).innerHTML = `<div class="tooltip" onclick="unequip('${_}','equipped')" style="height:64px;width:64px;background-image:url(${stats.equipped[_].img});background-size: cover;"><span class="tooltiptext">[Lv.${stats.equipped[_].level}] <b>${stats.equipped[_].reforge}</b> ${stats.equipped[_].name} ${stats.equipped[_].stars}<br>⚔️ Attack: ${stats.equipped[_].atk + stats.equipped[_].atkBuff} (+${stats.equipped[_].atkBuff})<br>🛡️ Defense: ${stats.equipped[_].def}</span></div>`;
                 document.querySelector(itemDOM).style.background = stats.equipped[_].rarity;
             }else if(stats.equipped[_].defBuff > 0){
                 document.querySelector(itemDOM).innerHTML = `<div class="tooltip" onclick="unequip('${_}','equipped')" style="height:64px;width:64px;background-image:url(${stats.equipped[_].img});background-size: cover;"><span class="tooltiptext">[Lv.${stats.equipped[_].level}] <b>${stats.equipped[_].reforge}</b> ${stats.equipped[_].name} ${stats.equipped[_].stars}<br>⚔️ Attack: ${stats.equipped[_].atk}<br>🛡️ Defense: ${stats.equipped[_].def + stats.equipped[_].defBuff} (+${stats.equipped[_].defBuff})</span></div>`;
-                document.querySelector(itemDOM).style.background = stats.equipped[_].rarity;
-            }else if(stats.equipped[_].atkBuff > 0 && stats.equipped[_].defBuff > 0){
-                document.querySelector(itemDOM).innerHTML = `<div class="tooltip" onclick="unequip('${_}','equipped')" style="height:64px;width:64px;background-image:url(${stats.equipped[_].img});background-size: cover;"><span class="tooltiptext">[Lv.${stats.equipped[_].level}] <b>${stats.equipped[_].reforge}</b> ${stats.equipped[_].name} ${stats.equipped[_].stars}<br>⚔️ Attack: ${stats.equipped[_].atk + stats.equipped[_].atkBuff} (+${stats.equipped[_].atkBuff })<br>🛡️ Defense: ${stats.equipped[_].def + stats.equipped[_].defBuff} (+${stats.equipped[_].defBuff})</span></div>`;
                 document.querySelector(itemDOM).style.background = stats.equipped[_].rarity;
             }else{
                 document.querySelector(itemDOM).innerHTML = `<div class="tooltip" onclick="unequip('${_}','equipped')" style="height:64px;width:64px;background-image:url(${stats.equipped[_].img});background-size: cover;"><span class="tooltiptext">[Lv.${stats.equipped[_].level}] <b>${stats.equipped[_].reforge}</b> ${stats.equipped[_].name} ${stats.equipped[_].stars}<br>⚔️ Attack: ${stats.equipped[_].atk}<br>🛡️ Defense: ${stats.equipped[_].def}</span></div>`;
