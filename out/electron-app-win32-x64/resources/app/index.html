@@ -10,18 +10,61 @@
 </head>
 <body>
     <div class="sidebar">
-        <span>Health: </span>
-        <meter id="healthBar" value="10" max="10" high="10" low="3"></meter>
+        <meter id="healthBar" value="100" max="100" high="10" low="3"></meter>
+        <span id="healthTxt">❤️ Health: 100/100</span><br>
+        <span id="defenseTxt">🛡️ Defense: 5</span><br>
+        <span id="attackTxt">⚔️ Attack: 5</span><br>
+        <span id="ehpTxt">💚 Effective Health: 105</span><br>
+        <span id="xp">⚗️ XP: 0/250</span><br>
+        <span id="level">🏅 Level: 1</span><br>
+        <span id="coins">Coins: <span id="coins.gold" style="color:gold;">0</span> / <span id="coins.silver" style="color:silver;">0</span> / <span id="coins.copper" style="color:orange;">10</span></span>
         <br>
-        <button id="savebtn">Save</button>
+        <button id="savebtn">Save</button><button id="loadbtn">Load</button>
     </div>
     <div class="stats">
+        <div id="equipped">
+            <div class="tooltip" id="head">
+                <span class="tooltiptext">Empty</span>
+            </div>
+            <div class="tooltip" id="chest">
+                <span class="tooltiptext">Empty</span>
+            </div>
+            <div class="tooltip" id="legs">
+                <span class="tooltiptext">Empty</span>
+            </div>
+            <div class="tooltip" id="weapon">
+                <span class="tooltiptext">Empty</span>
+            </div>
+            <div class="tooltip" id="accessory_1">
+                <span class="tooltiptext">Empty</span>
+            </div>
+            <div class="tooltip" id="accessory_2">
+                <span class="tooltiptext">Empty</span>
+            </div>
+        </div>
+        <div id="forge">
+            <h3>The Forge</h3>
+            <div id="forge-item">
+
+            </div>
+            <button id="lvlUpBtn" onclick="levelUpItem()">Level Up Item (100 Copper)</button>
+            <button id="mstrFrgeBtn" onclick="Masterforge()">Masterforge Item (1M gold)</button>
+            <button id="starBtn" onclick="addStar()">Add a star</button>
+        </div>
+        <div id="enemy">
+            <button id="enemy-attack" onclick="attack()">Attack</button>
+            <div style="width:50%;margin:auto;">
+                <h3 id="enemy-name">Enemy</h3>
+                <img src="./img/ui/blank_person.png" height="128px" width="128px" id="enemy-img"><br>
+                <span id="enemy-health">❤️ Health: 100</span><br>
+                <span id="enemy-defense">🛡️ Defense: 10</span><br>
+                <span id="enemy-attackTxt">⚔️ Attack: 10</span>
+            </div>
+        </div>
         <div id="inventory">
-            <div id="head" class="head"></div>
-            <div id="body"></div>
-            <div id="legs"></div>
-            <div></div>
+
         </div>
     </div>
+    <div id="xpTexts"></div>
 </body>
 </html> 

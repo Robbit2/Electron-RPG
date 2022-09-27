@@ -16,9 +16,10 @@ var stats = {
     maxHealth: 100,
     attack : 5,
     defense : 5,
+    regen: 100, // Get's smaller to regen more /s
     level: 1,
     xp: 0,
-    inventory : [{name:"Stick",img:"./img/items/weapons/swords/stick.png",id:"weapon:stick",atk:5,def:0,type:"weapon",rarity:"#a8a8a8",level:1,gilded:false,"stars":"✪✪✪✪✪","reforge":"Spicy",atkBuff:10,defBuff:100},{name:"Bunny Mask",img:"./img/items/accessories/bunny_mask.png",id:"accessory:bunny_mask",atk:5,def:5,type:"accessory.2",rarity:"#a8a8a8",level:100,gilded:true,stars:"",reforge:"",atkBuff:10,defBuff:10},{name:"Fallen Star",img:"./img/items/fallen_star.png",id:"item:fallen_star",atk:5,def:5,type:"item",rarity:"#a8a8a8",level:2,gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0}],
+    inventory : [{name:"Stick",img:"./img/items/weapons/swords/stick.png",id:"weapon:stick",atk:5,def:0,type:"weapon",rarity:"#a8a8a8",level:1,gilded:false,"stars":"✪✪✪✪✪","reforge":"Spicy",atkBuff:10,defBuff:100},{name:"Bunny Mask",img:"./img/items/accessories/bunny_mask.png",id:"accessory:bunny_mask",atk:5,def:5,type:"accessory.2",rarity:"#a8a8a8",level:1,gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0},{name:"Fallen Star",img:"./img/items/fallen_star.png",id:"item:fallen_star",atk:5,def:5,type:"item",rarity:"#a8a8a8",level:2,gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0}],
     equipped : {
         head : null,
         chest : null,
@@ -87,7 +88,7 @@ function xpReq(){
 
 
 // --- [ creates the floating xp text ] --- \\
-function xpText(amount){
+function floatText(amount,text,color){
     var txtDom = document.createElement("span");
     document.querySelector("#xpTexts").appendChild(txtDom);
     var height = window.innerHeight;
@@ -95,8 +96,8 @@ function xpText(amount){
     var x = Math.floor(Math.random()*width);
     var y = Math.floor(Math.random()*height);
     var opac = 100;
-    txtDom.innerHTML = `+${amount}XP`;
-    txtDom.style.color = "lime";
+    txtDom.innerHTML = `+${amount}${text}`;
+    txtDom.style.color = color;
     txtDom.style.position = "absolute";
     txtDom.style.top = `${y}px`;
     txtDom.style.left = `${x}px`;
@@ -173,7 +174,7 @@ function getExp(){
     if(stats.xp >= xpReqInt){
         levelUp(xpEarned);
     }
-    xpText(xpEarned);
+    floatText(xpEarned,"XP","lime");
     return xpEarned;
 }
 
@@ -194,6 +195,7 @@ function renderEnemy(){
         if(stats.currentEnemy.health <= 0){
             ipc.send('killed',stats.currentEnemy.name());
             lootFromTable(stats.currentEnemy.getStats()[5]);
+            dropCoins();
             stats.currentEnemy = null;
             getExp();
             chooseEnemy();
@@ -202,6 +204,24 @@ function renderEnemy(){
 }
 
 
+function dropCoins(){
+    var coinType = Math.floor(Math.random()*150);
+    var coinColor = "";
+    if(coinType < 76){
+        coinType = "copper";
+        coinColor = "orange";
+    }else if(coinType > 75 && coinType < 126){
+        coinType = "silver";
+        coinColor = "silver";
+    }else if(coinType > 125){
+        coinType = "gold";
+        coinColor = "gold";
+    }
+    var coinAmount = Math.ceil(Math.random()*100*stats.level);
+    floatText(coinAmount," Coins",coinColor);
+    stats.money[coinType] += coinAmount;
+}
+
 function updateForge(){
     if(stats.forge == null){
         let forgeDOM = `#forge-item`;
@@ -209,6 +229,9 @@ function updateForge(){
         document.querySelector(forgeDOM).style.background = `url("./img/ui/forge_item_slot.png")`;
         document.querySelector(forgeDOM).style.backgroundSize = "cover";
         document.querySelector("#lvlUpBtn").innerHTML = `Level Up Item (100 Copper)`;
+        document.querySelector("#mstrFrgeBtn").innerHTML = `Masterforge (1M Gold)`;
+        document.querySelector("#mstrFrgeBtn").disabled = false;
+        document.getElementById("lvlUpBtn").disabled = false;
     }else{
         let lvlUpCost = stats.forge.level*(stats.forge.level-1)*100;
         let forgeDOM = `#forge-item`;
@@ -238,6 +261,13 @@ function updateForge(){
             document.querySelector("#lvlUpBtn").innerHTML = `Item Is Max Level`;
             document.getElementById("lvlUpBtn").disabled = true;
         }
+        if(stats.forge.gilded == true){
+            document.querySelector("#mstrFrgeBtn").innerHTML = `Item is already masterforged`;
+            document.querySelector("#mstrFrgeBtn").disabled = true;
+        }else{
+            document.querySelector("#mstrFrgeBtn").innerHTML = `Masterforge (1M Gold)`;
+            document.querySelector("#mstrFrgeBtn").disabled = false;
+        }
     }
 }
 
@@ -247,7 +277,7 @@ function levelUpItem(){
     if(stats.forge.level <= 30){
         costType = "copper";
     }if(stats.forge.level > 30 && stats.forge.level <= 60){
-        ostType = "silver";
+        costType = "silver";
     }if(stats.forge.level > 60 && stats.forge.level <= 100){
         costType = "gold";
     }
@@ -255,14 +285,29 @@ function levelUpItem(){
     if(stats.money[costType] >= levelCost){
         stats.money[costType] -= levelCost;
         stats.forge.level += 1;
+        if(stats.forge.atk > 0){
+            stats.forge.atk ++;
+        }
+        if(stats.forge.def > 0){
+            stats.forge.def ++;
+        }
     }else{
         alert(`Not enough ${costType}`);
     }
+    updateForge();
 }
 
 
 function Masterforge(){
-    alert("masterforging is being implemented");
+    let reforges = [["Strong",50,0],["Legendary",75,75]];
+    if(stats.money.gold >= 1000000){
+        let randNum = Math.floor(Math.random() * reforges.length);
+        stats.forge.gilded = true;
+        stats.forge.reforge = reforges[randNum][0];
+        stats.forge.atkBuff = reforges[randNum][1];
+        stats.forge.defBuff = reforges[randNum][2];
+        updateForge();
+    }
 }
 
 
@@ -272,10 +317,15 @@ function addStar(){
             if(stats.inventory[_].name == "Fallen Star"){
                 if(stats.forge.gilded == true){
                     stats.forge.stars += "✪";
-                    updateForge()
+                    updateForge();
+                    stats.inventory.splice(_,1);
+                    updateInventory();
+                    stats.forge.atk *= 1.25;
+                    stats.forge.def *= 1.25;
                 }else{
                     alert("Item must be masterforged!")
                 }
+                break
             }
         }
     }else{
@@ -491,8 +541,18 @@ function updateMoney(){
     },250)
 }
 
+function regeneration(){
+    setInterval(() => {
+        if(stats.health !== stats.maxHealth){
+            stats.health += Math.ceil(stats.maxHealth/100);
+        }
+    },1000)
+}
+
 updateEquipped();
 updateHealth();
 updateInventory();
 chooseEnemy();
 renderEnemy();
+updateMoney();
+regeneration();
