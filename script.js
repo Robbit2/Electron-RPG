@@ -4,6 +4,7 @@ const ipc = electron.ipcRenderer;
 const items = require("./item_db");
 const enemies = require("./enemies");
 const { stat } = require('original-fs');
+const uuidM = require("uuid");
 
 
 // --- [ Audio Sources ] --- \\
@@ -19,7 +20,7 @@ var stats = {
     regen: 100, // Get's smaller to regen more /s
     level: 1,
     xp: 0,
-    inventory : [{name:"Stick",img:"./img/items/weapons/swords/stick.png",id:"weapon:stick",atk:5,def:0,type:"weapon",rarity:"#a8a8a8",level:1,gilded:false,"stars":"✪✪✪✪✪","reforge":"Spicy",atkBuff:10,defBuff:100},{name:"Bunny Mask",img:"./img/items/accessories/bunny_mask.png",id:"accessory:bunny_mask",atk:5,def:5,type:"accessory.2",rarity:"#a8a8a8",level:1,gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0},{name:"Fallen Star",img:"./img/items/fallen_star.png",id:"item:fallen_star",atk:5,def:5,type:"item",rarity:"#a8a8a8",level:2,gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0}],
+    inventory : [],
     equipped : {
         head : null,
         chest : null,
@@ -131,7 +132,12 @@ function lootFromTable(table){
         var weight = table[_][1];
         counter += weight;
         if(num <= counter){
-            let pickItem = table[_][0];
+            let pickItem = {};
+            for(_i in table[_][0]){
+                pickItem[_i] = table[_][0][_i];
+            }
+            newUUID = uuidM.v4();
+            pickItem.uuid = newUUID;
             alert(`You found a [Lv.${pickItem.level}] ${pickItem.reforge} ${pickItem.name} ${pickItem.stars}`);
             stats.inventory.push(pickItem);
             updateEquipped();
