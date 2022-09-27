@@ -9,8 +9,10 @@
 ## Alpha 0.3.0a
 - [x] Added items for all inventory slots
 - [x] Started the forge
+- [x] Enemies now drop loot
 - [ ] Added zone 2 enemies
 ## Alpha 0.5.0a
+- [ ] Finished the forge
 - [ ] Added the ability to create bosses (as a dev)
 
 # Beta Versions
