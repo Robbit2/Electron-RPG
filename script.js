@@ -5,12 +5,15 @@ const items = require("./item_db");
 const enemies = require("./enemies");
 const { stat } = require('original-fs');
 const uuidM = require("uuid");
+const numeral = require("numeral");
 
 
 // --- [ Audio Sources ] --- \\
 const eatSound = new Audio("./audio/eat.wav");
 const hitSound = new Audio("./audio/hit.wav");
 hitSound.volume = 0.5;
+
+var rarites = ["#a8a8a8","#30b50b","#0b66b5","#7c0bb5","#d9b00d","#c72510"];
 
 var stats = {
     health : 100, 
@@ -33,7 +36,7 @@ var stats = {
     money : {
         gold : 0,
         silver : 0,
-        copper : 10
+        copper : 0
     },
     attacking: false,
     currentEnemy: null,
@@ -94,14 +97,19 @@ function floatText(amount,text,color){
     document.querySelector("#xpTexts").appendChild(txtDom);
     var height = window.innerHeight;
     var width = window.innerWidth;
-    var x = Math.floor(Math.random()*width);
-    var y = Math.floor(Math.random()*height);
+    var x = Math.floor(Math.random()*width-100);
+    var y = Math.floor(Math.random()*height-100);
     var opac = 100;
-    txtDom.innerHTML = `+${amount}${text}`;
+    if(color == "red"){
+        txtDom.innerHTML = `-${numeral(amount).format("0,0")}${text}`;
+    }else{
+        txtDom.innerHTML = `+${numeral(amount).format("0,0")}${text}`;
+    }
     txtDom.style.color = color;
     txtDom.style.position = "absolute";
     txtDom.style.top = `${y}px`;
     txtDom.style.left = `${x}px`;
+    txtDom.style.fontSize = "20px";
     var e = setInterval(() => {
         y -= 5;
         opac -= 1;
@@ -272,11 +280,11 @@ function updateForge(){
         if(stats.forge.level < 100){
             document.getElementById("lvlUpBtn").disabled = false;
             if(stats.forge.level <= 30){
-                document.querySelector("#lvlUpBtn").innerHTML = `Level Up Item (${lvlUpCost} Copper)`;
+                document.querySelector("#lvlUpBtn").innerHTML = `Level Up Item (${numeral(lvlUpCost).format('0,0')} Copper)`;
             }if(stats.forge.level > 30 && stats.forge.level <= 60){
-                document.querySelector("#lvlUpBtn").innerHTML = `Level Up Item (${lvlUpCost} Silver)`;
+                document.querySelector("#lvlUpBtn").innerHTML = `Level Up Item (${numeral(lvlUpCost).format('0,0')} Silver)`;
             }if(stats.forge.level > 60 && stats.forge.level <= 100){
-                document.querySelector("#lvlUpBtn").innerHTML = `Level Up Item (${lvlUpCost} Gold)`;
+                document.querySelector("#lvlUpBtn").innerHTML = `Level Up Item (${numeral(lvlUpCost).format('0,0')} Gold)`;
             }
         }else{
             document.querySelector("#lvlUpBtn").innerHTML = `Item Is Max Level`;
@@ -393,7 +401,7 @@ function eHP(){
         }
     }
     var effectiveHealth = Math.round(maxHealth * (1 + (defense/100)));
-	return effectiveHealth;
+	return numeral(effectiveHealth).format("0,0");
 }
 
 
@@ -426,11 +434,14 @@ function updateHealth(){
         if(stats.health <= 0 && stats.dead == false){
             ipc.send("death",stats.currentEnemy.name());
             stats.dead = true;
+            for(_ in stats.money){
+                stats.money[_] = Math.ceil(stats.money[_] / 2);
+            }
         }
         if(stats.health <= stats.maxHealth / 2){
-            healthTxt.innerHTML = `💔 Health: ${stats.health}/${stats.maxHealth}`;
+            healthTxt.innerHTML = `💔 Health: ${numeral(stats.health).format("0,0")}/${numeral(stats.maxHealth).format("0,0")}`;
         }else{
-            healthTxt.innerHTML = `❤️ Health: ${stats.health}/${stats.maxHealth}`;
+            healthTxt.innerHTML = `❤️ Health: ${numeral(stats.health).format("0,0")}/${numeral(stats.maxHealth).format("0,0")}`;
         }
         // --- [ _stats is the addStats function, 0 is attack & 1 is defense ] --- \\
         defenseTxt.innerHTML = `🛡️ Defense: ${_stats[1]}`;
@@ -554,11 +565,12 @@ function attack(){
     stats.currentEnemy.health -= passE;
     stats.health -= passP;
     hitSound.play();
+    floatText(numeral(passE).format("0,0"),"HP","red")
 }
 
 function updateMoney(){
     setInterval(() => {
-        document.querySelector("#coins").innerHTML = `Coins: <span id="coins.gold" style="color:gold;">${stats.money.gold}</span> / <span id="coins.silver" style="color:silver;">${stats.money.silver}</span> / <span id="coins.copper" style="color:orange;">${stats.money.copper}</span>`;
+        document.querySelector("#coins").innerHTML = `Coins: <span id="coins.gold" style="color:gold;">${numeral(stats.money.gold).format("0.0a")}</span> / <span id="coins.silver" style="color:silver;">${numeral(stats.money.silver).format("0.0a")}</span> / <span id="coins.copper" style="color:orange;">${numeral(stats.money.copper).format("0.0a")}</span>`;
     },250)
 }
 

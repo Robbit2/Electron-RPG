@@ -44,6 +44,7 @@ body{
 #equipped{
     display:block;
     width:100%;
+    height:65vh;
     border:1px solid white;
     grid-column: 1 / span 1;
     grid-row: 1 / span 2;
@@ -138,6 +139,7 @@ body{
 #inventory {
     border:6px solid rgb(92, 91, 91);
     width:99%;
+    height:30vh;
     overflow-y: scroll;
     overflow-x: hidden;
     grid-column: 1 / span 3;
@@ -184,6 +186,7 @@ body{
 
 #enemy {
     width:100%;
+    height:65vh;
     border:1px solid white;
     grid-column: 3 / span 1;
     grid-row: 1 / span 2;
@@ -234,7 +237,7 @@ body{
     grid-column: 2 / span 1;
     grid-row: 1 / span 2;
     width:100%;
-    height:70%;
+    height:65vh;
     text-align:center;
 }
 
