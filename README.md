@@ -1,2 +1,2 @@
 # Electron RPG (Placeholder Name)
-## v0.4.3-alpha
+## v0.5.0-alpha
