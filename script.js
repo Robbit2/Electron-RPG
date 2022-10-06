@@ -6,7 +6,7 @@ const enemies = require("./enemies");
 const { stat } = require('original-fs');
 const uuidM = require("uuid");
 const numeral = require("numeral");
-
+const moment = require("moment");
 
 // --- [ Audio Sources ] --- \\
 const eatSound = new Audio("./audio/eat.wav");
@@ -20,10 +20,10 @@ var stats = {
     maxHealth: 100,
     attack : 5,
     defense : 5,
-    regen: 100, // Get's smaller to regen more /s
+    regen: 100, // Gets smaller to regen more /s
     level: 1,
     xp: 0,
-    inventory : [],
+    inventory : [{name:"☤ ☥ Steel Sword",img:"./img/items/weapons/swords/steel_sword.png",id:"weapon:steel_sword",atk:20,def:0,type:"weapon",rarity:"#a8a8a8",level:4,gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0}],
     equipped : {
         head : null,
         chest : null,
@@ -34,20 +34,27 @@ var stats = {
     },
     forge : null,
     money : {
-        gold : 0,
+        gold : 10000000,
         silver : 0,
         copper : 0
     },
     attacking: false,
     currentEnemy: null,
-    dead: false
+    dead: false,
+    stocks : [[Date.now(),100,50,10],[Date.now(),100,50,10]],
+    amtStocks : [0,0,0],
+    stockChange : 5
 };
 
 
 var area1Loot = [[{name:"Stick",img:"./img/items/weapons/swords/stick.png",id:"weapon:stick",atk:5,def:0,type:"weapon",rarity:"#a8a8a8",level:1,gilded:false,"stars":"","reforge":"",atkBuff:0,defBuff:0},50],[{name:"Wooden Chestplate",img:"./img/items/armor/wooden_chestplate.png",id:"armor:wooden_chestplate",atk:0,def:8,type:"armor.chest",rarity:"#a8a8a8",level:1,gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0},16.6],[{name:"Wooden Helmet",img:"./img/items/armor/wooden_helmet.png",id:"armor:wooden_helmet",atk:0,def:5,type:"armor.helmet",rarity:"#a8a8a8",level:1,gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0},16.6],[{name:"Wooden Boots",img:"./img/items/armor/wooden_boots.png",id:"armor:wooden_boots",atk:0,def:2,type:"armor.legs",rarity:"#a8a8a8",level:1,gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0},16.7]]
-var area2loot = [[{name:"Wood Ring",img:"",id:"accessory.1:wood_ring",atk:1,def:1,type:"accessory.1",rarity:"#a8a8a8",level:1,gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0},50],[{name:"Bunny Mask",img:"./img/items/accessories/bunny_mask.png",id:"accessory:bunny_mask",atk:5,def:5,type:"accessory.2",rarity:"#a8a8a8",level:2,gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0},50]]
+var area2loot = [[{name:"Wood Ring",img:"",id:"accessory.1:wood_ring",atk:1,def:1,type:"accessory.1",rarity:"#a8a8a8",level:1,gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0},50],[{name:"Bunny Mask",img:"./img/items/accessories/bunny_mask.png",id:"accessory:bunny_mask",atk:5,def:5,type:"accessory.2",rarity:"#a8a8a8",level:2,gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0},25],[{name:"Steel Sword",img:"./img/items/weapons/swords/steel_sword.png",id:"weapon:steel_sword",atk:20,def:0,type:"weapon",rarity:"#a8a8a8",level:4,gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0},25]]
 
-// --- [ leve, health, defense, attack, loot] --- \\
+stats.inventory.push(items.searchDB("armor:steel_helmet"));
+stats.inventory.push(items.searchDB("armor:steel_chestplate"));
+stats.inventory.push(items.searchDB("armor:steel_boots"));
+
+// --- [ level, health, defense, attack, loot] --- \\
 function chooseEnemy(){
     if(stats.currentEnemy == null){
         if(stats.level <= 10){
@@ -73,7 +80,8 @@ function updateInventory(){
     const invDOM = document.querySelector("#inventory");
     invDOM.innerHTML = "";
     for(_ in stats.inventory){
-        invDOM.innerHTML += `<div class="tooltip" onclick="equip(${_});" style="height:64px;width:64px;background-color:${stats.inventory[_].rarity};background-image:url(${stats.inventory[_].img});background-size: cover;border:4px solid rgb(92, 91, 91);" oncontextmenu="inForge(${_})"><span class="tooltiptext">[Lv.${stats.inventory[_].level}] <b>${stats.inventory[_].reforge}</b> ${stats.inventory[_].name} ${stats.inventory[_].stars}</span></div>`;
+        invDOM.innerHTML += `<div class="tooltip" style="height:64px;width:64px;background-color:${stats.inventory[_].rarity};background-image:url(${stats.inventory[_].img});background-size: cover;border:4px solid rgb(92, 91, 91);"><span class="tooltiptext">[Lv.${stats.inventory[_].level}] <b>${stats.inventory[_].reforge}</b> ${stats.inventory[_].name} ${stats.inventory[_].stars}</span><div class="dropdown">
+        <button class="dropbtn">▼</button><div class="dropdown-content"><a href="#" onclick="equip(${_})">Equip</a><a href="#" onclick="inForge(${_})">Forge</a><a href="#" onclick="scrap(${_})">Scrap</a></div></div></div>`;
     }
 }
 
@@ -91,11 +99,22 @@ function inForge(id){
     updateInventory();
 }
 
+function scrap(id){
+    if(confirm(`Are you sure you'd like to scrap your [Lv.${stats.inventory[id].level}] ${stats.inventory[id].reforge} ${stats.inventory[id].name} ${stats.inventory[id].stars} for 200 Silver?`) == true){
+        stats.inventory.splice(id,1);
+        stats.money.silver += 200;
+        alert(`You sold your [Lv.${stats.inventory[id].level}] ${stats.inventory[id].reforge} ${stats.inventory[id].name} ${stats.inventory[id].stars}`);
+        updateInventory();
+    }
+}
 
 // --- [ Returns the xp required to level up ] --- \\
 function xpReq(){
     var cl = stats.level;
     var xpReqInt = cl*(cl-1)*250;
+    if(xpReqInt <= 0){
+        xpReqInt = 250;
+    }
     return xpReqInt;
 }
 
@@ -272,6 +291,9 @@ function updateForge(){
         document.getElementById("lvlUpBtn").disabled = false;
     }else{
         let lvlUpCost = stats.forge.level*(stats.forge.level-1)*100;
+        if(lvlUpCost <= 0){
+            lvlUpCost = 100;
+        }
         let forgeDOM = `#forge-item`;
         if(stats.forge.defBuff > 0 && stats.forge.atkBuff > 0){
             document.querySelector(forgeDOM).innerHTML = `<div class="tooltipforge" onclick="unequip('${stats.forge}')" style="height:128px;width:128px;background-image:url(${stats.forge.img});background-size: cover;"><span class="tooltiptextforge">[Lv.${stats.forge.level}] <b>${stats.forge.reforge}</b> ${stats.forge.name} ${stats.forge.stars}<br>⚔️ Attack: ${stats.forge.atk + stats.forge.atkBuff} (+${stats.forge.atkBuff})<br>🛡️ Defense: ${stats.forge.def + stats.forge.defBuff} (+${stats.forge.defBuff})</span></div>`;
@@ -320,6 +342,9 @@ function levelUpItem(){
         costType = "gold";
     }
     let levelCost = stats.forge.level*(stats.forge.level-1)*100;
+    if(levelCost <= 0){
+        levelCost = 100;
+    }
     if(stats.money[costType] >= levelCost){
         stats.money[costType] -= levelCost;
         stats.forge.level += 1;
@@ -590,6 +615,119 @@ function regeneration(){
         }
     },1000)
 }
+function stockMarket(){
+    let currentCosts = stats.stocks[stats.stocks.length-1];
+    let copperDOM = document.querySelector("#cstock-price");
+    let silverDOM = document.querySelector("#sstock-price");
+    let goldDOM = document.querySelector("#gstock-price");
+    copperDOM.innerHTML = `$${numeral(stats.stocks[1][3]).format('0.0a')}`;
+    silverDOM.innerHTML = `$${numeral(stats.stocks[1][2]).format('0.0a')}`;
+    goldDOM.innerHTML = `$${numeral(stats.stocks[1][1]).format('0.0a')}`;
+    if(stats.stocks.length >= 3){
+        if(stats.stocks[1][1] < stats.stocks[stats.stocks.length-3][1]){goldDOM.style.color = "red"}
+        else if(stats.stocks[1][1] === stats.stocks[stats.stocks.length-3][1]){goldDOM.style.color = "lightgrey"}
+        else{goldDOM.style.color = "lime"}
+        if(stats.stocks[1][2] < stats.stocks[stats.stocks.length-3][2]){silverDOM.style.color = "red"}
+        else if(stats.stocks[1][2] === stats.stocks[stats.stocks.length-3][2]){silverDOM.style.color = "lightgrey"}
+        else{silverDOM.style.color = "lime"}
+        if(stats.stocks[1][3] < stats.stocks[stats.stocks.length-3][3]){copperDOM.style.color = "red"}
+        else if(stats.stocks[1][3] === stats.stocks[stats.stocks.length-3][3]){copperDOM.style.color = "lightgrey"}
+        else{copperDOM.style.color = "lime"}
+    }
+    setInterval(() => {
+        if(stats.stockChange <= 0){
+            let spikeChance = Math.round(Math.random()*3);
+            if(spikeChance == 1){
+                let currentCosts = stats.stocks[stats.stocks.length-1];
+                //alert(currentCosts)
+                stats.stocks[0] = currentCosts;
+                stats.stocks[1] = [Date.now(),currentCosts[1],currentCosts[2],currentCosts[3]];
+                stats.stockChange = 60;
+                let cChange = Math.ceil(Math.random()*50)+50;
+                let sChange = Math.ceil(Math.random()*50)+50;
+                let gChange = Math.ceil(Math.random()*50)+50;
+                let cPercent = Number(`1.${cChange}`);
+                let sPercent = Number(`1.${sChange}`);
+                let gPercent = Number(`1.${gChange}`);
+                let cIncDec = Math.ceil(Math.random()*3);
+                let sIncDec = Math.ceil(Math.random()*3);
+                let gIncDec = Math.ceil(Math.random()*3);
+                if(cIncDec == 2){stats.stocks[1][3] *= cPercent;}
+                else{stats.stocks[1][3] /= cPercent;}
+                if(sIncDec == 2){stats.stocks[1][2] *= sPercent;}
+                else{stats.stocks[1][2] /= sPercent;}
+                if(gIncDec == 2){stats.stocks[1][1] *= gPercent;}
+                else{stats.stocks[1][1] /= gPercent}
+                currentCosts = stats.stocks[stats.stocks.length-1];
+            }else{
+                let currentCosts = stats.stocks[stats.stocks.length-1];
+                //alert(currentCosts)
+                stats.stocks[0] = currentCosts;
+                stats.stocks[1] = [Date.now(),currentCosts[1],currentCosts[2],currentCosts[3]];
+                stats.stockChange = 60;
+                let cChange = Math.ceil(Math.random()*5);
+                let sChange = Math.ceil(Math.random()*5);
+                let gChange = Math.ceil(Math.random()*5);
+                let cPercent = Number(`1.0${cChange}`);
+                let sPercent = Number(`1.0${sChange}`);
+                let gPercent = Number(`1.0${gChange}`);
+                let cIncDec = Math.ceil(Math.random()*2);
+                let sIncDec = Math.ceil(Math.random()*2);
+                let gIncDec = Math.ceil(Math.random()*2);
+                if(cIncDec == 2){stats.stocks[1][3] *= cPercent;}
+                else{stats.stocks[1][3] /= cPercent;}
+                if(sIncDec == 2){stats.stocks[1][2] *= sPercent;}
+                else{stats.stocks[1][2] /= sPercent;}
+                if(gIncDec == 2){stats.stocks[1][1] *= gPercent;}
+                else{stats.stocks[1][1] /= gPercent}
+                stats.stocks[1] = stats.stocks[stats.stocks.length-1];
+            }
+        }
+        if(stats.stockChange.toString().length == 2){
+            document.querySelector("#stock-update").innerHTML = `Updating in ${stats.stockChange.toString().substring(0,2)}s`;
+        }if(stats.stockChange.toString().length < 2){
+            document.querySelector("#stock-update").innerHTML = `Updating in 0${stats.stockChange.toString().substring(0,1)}s`;
+        }
+        stats.stockChange -= 1;
+        copperDOM.innerHTML = `$${numeral(stats.stocks[1][3]).format('0.0a')}`;
+        silverDOM.innerHTML = `$${numeral(stats.stocks[1][2]).format('0.0a')}`;
+        goldDOM.innerHTML = `$${numeral(stats.stocks[1][1]).format('0.0a')}`;
+        if(stats.stocks.length >= 2){
+            if(stats.stocks[1][1] < stats.stocks[stats.stocks.length-2][1]){goldDOM.style.color = "red"}
+            else if(stats.stocks[1][1] === stats.stocks[stats.stocks.length-2][1]){goldDOM.style.color = "lightgrey"}
+            else{goldDOM.style.color = "lime"}
+            if(stats.stocks[1][2] < stats.stocks[stats.stocks.length-2][2]){silverDOM.style.color = "red"}
+            else if(stats.stocks[1][2] === stats.stocks[stats.stocks.length-2][2]){silverDOM.style.color = "lightgrey"}
+            else{silverDOM.style.color = "lime"}
+            if(stats.stocks[1][3] < stats.stocks[stats.stocks.length-2][3]){copperDOM.style.color = "red"}
+            else if(stats.stocks[1][3] === stats.stocks[stats.stocks.length-2][3]){copperDOM.style.color = "lightgrey"}
+            else{copperDOM.style.color = "lime"}
+        }
+    },1000)
+}
+
+function buyStock(currency){
+    let currentCosts = stats.stocks[stats.stocks.length-1];
+    if(currency == "gold"){
+        let goldStock = Math.floor(currentCosts[1]+0.5);
+        if(stats.money.gold >= goldStock){
+            stats.money.gold -= goldStock;
+            floatText(1,"Gold Stock","gold");
+            stats.amtStocks[0] ++;
+        }else{
+            alert("You don't have enough gold!")
+        }
+    }else if(currency == "silver"){
+        let silverStock = Math.floor(currentCosts[2]+0.5);
+        if(stats.money.silver >= silverStock){
+            stats.money.silver -= silverStock;
+            floatText(1,"Silver Stock","silver");
+            stats.amtStocks[1] ++;
+        }else{
+            alert("You don't have enough silver!")
+        }
+    }
+}
 
 updateEquipped();
 updateHealth();
@@ -598,3 +736,4 @@ chooseEnemy();
 renderEnemy();
 updateMoney();
 regeneration();
+stockMarket();

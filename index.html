@@ -5,6 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.anychart.com/releases/8.10.0/js/anychart-base.min.js"></script>
     <script defer src="script.js"></script>
     <title>RPG</title>
 </head>
@@ -44,7 +46,7 @@
         </div>
         <div id="forge">
             <h3>The Forge</h3>
-            <div id="forge-item">
+            <div id="forge-item" drop="alert('e')">
 
             </div>
             <button id="lvlUpBtn" onclick="levelUpItem()">Level Up Item (100 Copper)</button>
@@ -63,6 +65,16 @@
         </div>
         <div id="inventory">
 
+        </div>
+    </div>
+    <div class="extra-content">
+        <div id="stock-market">
+            <h1>Stock market</h1>
+            <span style="font-size:24px;"><span id="cstock-price">$1</span> | <span id="sstock-price">$2</span> | <span id="gstock-price">$3</span></span><br>
+            <span id="stocks-amount">You own: 0 Gold | 0 Silver | 0 Copper Stocks</span>
+            <h4 id="stock-update">Updating in 60s</h4>
+            <button onclick="buyStock('gold')">Buy Gold Stock</button><button onclick="buyStock('silver')">Buy Silver Stock</button><button onclick="buyStock('copper')">Buy Copper Stock</button>
+            <button onclick="sellStock('gold')">Sell Gold Stock</button><button onclick="sellStock('silver')">Sell Silver Stock</button><button onclick="sellStock('copper')">Sell Copper Stock</button>
         </div>
     </div>
     <div id="xpTexts"></div>
