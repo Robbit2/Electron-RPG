@@ -703,6 +703,7 @@ function stockMarket(){
             else if(stats.stocks[1][3] === stats.stocks[stats.stocks.length-2][3]){copperDOM.style.color = "lightgrey"}
             else{copperDOM.style.color = "lime"}
         }
+        document.querySelector("#stocks-amount").innerHTML = `You own: ${stats.amtStocks[0]} Gold | ${stats.amtStocks[1]} Silver | ${stats.amtStocks[2]} Copper Stocks`;
     },1000)
 }
 
@@ -726,7 +727,41 @@ function buyStock(currency){
         }else{
             alert("You don't have enough silver!")
         }
+    }else if(currency == "copper"){
+        let copperStock = Math.floor(currentCosts[3]+0.5);
+        if(stats.money.copper >= copperStock){
+            stats.money.copper -= copperStock;
+            floatText(1,"Copper Stock","orange");
+            stats.amtStocks[2] ++;
+        }else{
+            alert("You don't have enough copper!")
+        }
     }
+    document.querySelector("#stocks-amount").innerHTML = `You own: ${stats.amtStocks[0]} Gold | ${stats.amtStocks[1]} Silver | ${stats.amtStocks[2]} Copper Stocks`;
+}
+
+function sellStock(currency){
+    let currentCosts = stats.stocks[stats.stocks.length-1];
+    if(currency == "gold"){
+        if(stats.amtStocks[0] > 0){
+            stats.money.gold += Math.floor(currentCosts[1] + 0.5);
+            stats.amtStocks[0] -= 1;
+            floatText(Math.floor(currentCosts[1] + 0.5),"Gold","gold");
+        }
+    }else if(currency == "silver"){
+        if(stats.amtStocks[1] > 0){
+            stats.money.gold += Math.floor(currentCosts[2] + 0.5);
+            stats.amtStocks[1] -= 1;
+            floatText(Math.floor(currentCosts[2] + 0.5),"Silver","silver");
+        }
+    }else if(currency == "copper"){
+        if(stats.amtStocks[2] > 0){
+            stats.money.gold += Math.floor(currentCosts[3] + 0.5);
+            stats.amtStocks[2] -= 1;
+            floatText(Math.floor(currentCosts[3] + 0.5),"Copper","orange");
+        }
+    }
+    document.querySelector("#stocks-amount").innerHTML = `You own: ${stats.amtStocks[0]} Gold | ${stats.amtStocks[1]} Silver | ${stats.amtStocks[2]} Copper Stocks`;
 }
 
 updateEquipped();
