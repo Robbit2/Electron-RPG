@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2022-10-19
+### Added
+- Pets
+   - Red, Orange, Yellow, Green, Blue, Purple, Pink, & Black variants
+- Pets lose hunger and thirst every 10 seconds
+   - If a pet's hunger/thirst is below 50 the pet losses 1 happiness every 5 seconds
+
 ## [0.6.1] - 2022-10-07
 ### Added
 - The ability to sell stocks for their current price, not the price they were bought for
@@ -52,6 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Attack, defense, Effective HP and other stats that are integral to the game
 
 [Unreleased]: https://github.com/Robbit2/Electron-RPG
+[0.7.0]: https://github.com/Robbit2/Electron-RPG/releases/tag/v0.7.0-alpha
 [0.6.1]: https://github.com/Robbit2/Electron-RPG/releases/tag/v0.6.1-alpha
 [0.6.0]: https://github.com/Robbit2/Electron-RPG/releases/tag/v0.6.0-alpha
 [0.5.0]: https://github.com/Robbit2/Electron-RPG/releases/tag/v0.5.0-alpha
