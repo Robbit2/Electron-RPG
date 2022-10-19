@@ -176,13 +176,12 @@ body{
     font-family: 'Oswald', sans-serif;
 }
 
-.sidebar #stats-btn, .sidebar #extras-btn {
+.sidebar #stats-btn, .sidebar #extras-btn, #pet button {
     height:32px;
     width:80%;
     margin:auto;
     border:2px solid #333;
     border-radius: 4px;
-    left:10%;
     font-size:16px;
     background-color: #555;
     color:white;
@@ -190,7 +189,7 @@ body{
     font-family: 'Oswald', sans-serif;
 }
 
-.sidebar #stats-btn:hover, .sidebar #extras-btn:hover {
+.sidebar #stats-btn:hover, .sidebar #extras-btn:hover, #pet button:hover {
     border:2px solid #ddd;
     border-radius: 4px;
     font-size:16px;

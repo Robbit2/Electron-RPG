@@ -34,7 +34,7 @@ var stats = {
     },
     forge : null,
     money : {
-        gold : 10000000,
+        gold : 0,
         silver : 0,
         copper : 0
     },
@@ -49,7 +49,8 @@ var stats = {
         hunger : 100,
         thirst : 100,
         img : "./img/pets/pet_red.png",
-        name : null
+        name : null,
+        value : 0
     }
 };
 
@@ -783,15 +784,55 @@ function sellStock(currency){
     document.querySelector("#stocks-amount").innerHTML = `You own: ${stats.amtStocks[0]} Gold | ${stats.amtStocks[1]} Silver | ${stats.amtStocks[2]} Copper Stocks`;
 }
 
+function capitalize(str){
+    const lower = str.toLowerCase();
+    return str.charAt(0).toUpperCase() + lower.slice(1);
+}
+
+function generateName(gender){
+    let namesM = ["CHRISTOPHER","JAMES","DAVID","DANIEL","MICHAEL","MATTHEW","ANDREW","RICHARD","PAUL","MARK","THOMAS","ADAM","ROBERT","JOHN","LEE","BENJAMIN","STEVEN","JONATHAN","CRAIG","STEPHEN","SIMON","NICHOLAS","PETER","ANTHONY","ALEXANDER","GARY","IAN","RYAN","LUKE","JAMIE","STUART","PHILIP","DARREN","WILLIAM","GARETH","MARTIN","KEVIN","SCOTT","DEAN","JOSEPH","JASON","NEIL","SAMUEL","CARL","BEN","SEAN","TIMOTHY","OLIVER","ASHLEY","WAYNE"]
+    let namesF = ["SARAH","LAURA","GEMMA","EMMA","REBECCA","CLAIRE","VICTORIA","SAMANTHA","RACHEL","AMY","JENNIFER","NICOLA","KATIE","LISA","KELLY","NATALIE","LOUISE","MICHELLE","HAYLEY","HANNAH","HELEN","CHARLOTTE","JOANNE","LUCY","ELIZABETH"] 
+    if(gender.toLowerCase() == "m"|| gender.toLowerCase() == "male"){
+        console.log(namesM[Math.floor(Math.random()*namesM.length+1)+0.5]);
+        return capitalize(namesM[Math.floor((Math.random()*namesM.length-1)+0.5)]);
+    }else{
+        return capitalize(namesF[Math.floor((Math.random()*namesF.length-1)+0.5)]);
+    }
+}
+
+function sellPet(){
+    if(confirm(`Are you sure you'd like to sell ${stats.pet.name}?`) == true){
+        let petColors = ["red","orange","yellow","green","blue","purple","pink","black"];
+        for(_ in petColors){
+            if(stats.pet.img.includes(petColors[_]) == true){
+                stats.money.gold += stats.pet.value * _ + 1;
+                if(petColors[_] == "black"){
+                    alert("You just sold the last pet! Congrats!");
+                    stats.pet.name = null;
+                }else{
+                    petColors.splice(_,1);
+                    alert(petColors[_])
+                    stats.pet.img = `./img/pets/pet_${petColors[_]}.png`;
+                    stats.pet.name = generateName("m");
+                    stats.pet.hunger = 100;
+                    stats.pet.thirst = 100;
+                    stats.pet.happiness = 100;
+                    stats.pet.value = 0;
+                }
+            }
+        }
+    }
+}
+
 function renderPet(){
     setInterval(() => {
         let namesM = ["CHRISTOPHER","JAMES","DAVID","DANIEL","MICHAEL","MATTHEW","ANDREW","RICHARD","PAUL","MARK","THOMAS","ADAM","ROBERT","JOHN","LEE","BENJAMIN","STEVEN","JONATHAN","CRAIG","STEPHEN","SIMON","NICHOLAS","PETER","ANTHONY","ALEXANDER","GARY","IAN","RYAN","LUKE","JAMIE","STUART","PHILIP","DARREN","WILLIAM","GARETH","MARTIN","KEVIN","SCOTT","DEAN","JOSEPH","JASON","NEIL","SAMUEL","CARL","BEN","SEAN","TIMOTHY","OLIVER","ASHLEY","WAYNE"]
         let namesF = ["SARAH","LAURA","GEMMA","EMMA","REBECCA","CLAIRE","VICTORIA","SAMANTHA","RACHEL","AMY","JENNIFER","NICOLA","KATIE","LISA","KELLY","NATALIE","LOUISE","MICHELLE","HAYLEY","HANNAH","HELEN","CHARLOTTE","JOANNE","LUCY","ELIZABETH"]
         if(stats.pet.name == null){
-            if(stats.pet.img.substring("red") !== -1){
-                stats.pet.name = namesF[Math.floor(namesF.length-1+0.5)];
+            if(stats.pet.img.includes("red") == true){
+                stats.pet.name = capitalize(namesF[Math.floor((Math.random()*namesF.length-1)+0.5)]);
             }else{
-                stats.pet.name = namesM[Math.floor(namesM.length-1+0.5)];
+                stats.pet.name = capitalize(namesM[Math.floor(Math.random(namesM.length-1)+0.5)]);
             }
         }
         // Pet variables/aliases
@@ -817,6 +858,7 @@ function renderPet(){
         hungerDOM.innerHTML = `🍖 Hunger: ${hunger}`;
         petIMGDOM.src = icon;
         nameDOM.innerHTML = stats.pet.name;
+        document.querySelector("#pet-btn").innerHTML = `Sell ${stats.pet.name}`;
     },250);
     setInterval(() => {
         if(stats.pet.hunger > 0){
@@ -830,6 +872,7 @@ function renderPet(){
         if(stats.pet.hunger < 50 || stats.pet.thirst < 50 && stats.pet.happiness > 0){
             stats.pet.happiness -= 1;
         }
+        stats.pet.value ++;
     },5000);
     return;
 }
