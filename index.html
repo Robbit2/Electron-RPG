@@ -22,6 +22,8 @@
         <span id="coins">Coins: <span id="coins.gold" style="color:gold;">0</span> / <span id="coins.silver" style="color:silver;">0</span> / <span id="coins.copper" style="color:orange;">10</span></span>
         <br>
         <button id="savebtn">Save</button><button id="loadbtn">Load</button>
+        <button id="stats-btn">Stats</button>
+        <button id="extras-btn">Extras</button>
     </div>
     <div class="stats">
         <div id="equipped">
@@ -75,6 +77,14 @@
             <h4 id="stock-update">Updating in 60s</h4>
             <button onclick="buyStock('gold')">Buy Gold Stock</button><button onclick="buyStock('silver')">Buy Silver Stock</button><button onclick="buyStock('copper')">Buy Copper Stock</button>
             <button onclick="sellStock('gold')">Sell Gold Stock</button><button onclick="sellStock('silver')">Sell Silver Stock</button><button onclick="sellStock('copper')">Sell Copper Stock</button>
+        </div>
+        <div id="pet">
+            <span id="pet-name"></span><br>
+            <img id="pet-img" height="128" width="128" style="margin:auto;"><br>
+            <span id="pet-happiness">😀 Happiness: 100</span><br>
+            <span id="pet-hunger">🍖 Hunger: 100</span><br>
+            <span id="pet-thirst">🥤 Thirst: 100</span><br>
+            <button id="pet-btn">Sell </button>
         </div>
     </div>
     <div id="xpTexts"></div>

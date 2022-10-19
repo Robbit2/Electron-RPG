@@ -176,6 +176,30 @@ body{
     font-family: 'Oswald', sans-serif;
 }
 
+.sidebar #stats-btn, .sidebar #extras-btn {
+    height:32px;
+    width:80%;
+    margin:auto;
+    border:2px solid #333;
+    border-radius: 4px;
+    left:10%;
+    font-size:16px;
+    background-color: #555;
+    color:white;
+    position:relative;
+    font-family: 'Oswald', sans-serif;
+}
+
+.sidebar #stats-btn:hover, .sidebar #extras-btn:hover {
+    border:2px solid #ddd;
+    border-radius: 4px;
+    font-size:16px;
+    background-color: #fff;
+    color:black;
+    position:relative;
+    font-family: 'Oswald', sans-serif;
+}
+
 .sidebar:before,
 .sidebar:after {
     content: "";
@@ -306,50 +330,14 @@ body{
     font-family: 'Oswald', sans-serif;
   }
 
-  #wheelOfFortune {
-    display: inline-flex;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  #wheel {
-    display: block;
-  }
-  
-  #spin {
-    font: 1.5rem/0 sans-serif;
-    user-select: none;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 30%;
-    height: 30%;
-    margin: -15%;
-    background: #fff;
-    color: #fff;
-    box-shadow: 0 0 0 8px currentColor, 0 0px 15px 5px rgba(0, 0, 0, 0.6);
-    border-radius: 50%;
-    transition: 0.8s;
-  }
-  
-  #spin::after {
-    content: "";
-    position: absolute;
-    top: -17px;
-    border: 10px solid transparent;
-    border-bottom-color: currentColor;
-    border-top: none;
-  }
-
   #stock-market { 
-    width: 32.3%; height: 100%; margin: 0; padding: 0;
+    height: 100%; margin: 0; padding: 0;
     float:left; 
     border:1px solid white;
     text-align:center;
+    height:100%;
+    grid-column: 1 / span 1;
+    grid-row: 1 / span 2;
   } 
 #cstock-price, #sstock-price, #gstock-price{
     font-family: 'Silkscreen', cursive;
@@ -379,4 +367,18 @@ body{
     color:#555;
     position:relative;
     font-family: 'Oswald', sans-serif;
+}
+
+#pet {
+    height: 100%; 
+    margin: 0; 
+    padding: 0;
+    border:1px solid white;
+    text-align:center;
+    grid-column: 2 / span 1;
+    grid-row: 1 / span 2;
+}
+
+#pet-name{
+    font-size:28px;
 }

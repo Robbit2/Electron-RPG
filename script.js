@@ -43,7 +43,14 @@ var stats = {
     dead: false,
     stocks : [[Date.now(),100,50,10],[Date.now(),100,50,10]],
     amtStocks : [0,0,0],
-    stockChange : 5
+    stockChange : 5,
+    pet : {
+        happiness : 100,
+        hunger : 100,
+        thirst : 100,
+        img : "./img/pets/pet_red.png",
+        name : null
+    }
 };
 
 
@@ -584,6 +591,18 @@ document.querySelector("#savebtn").addEventListener('click', function(){
     saveClient();
 })
 
+// --- [ Shows .extra-content ] --- \\
+document.querySelector("#extras-btn").addEventListener('click', function(){
+    document.querySelector(".stats").style.visibility = "hidden";
+    document.querySelector(".extra-content").style.visibility = "visible";
+})
+
+// --- [ Shows .stats ] --- \\
+document.querySelector("#stats-btn").addEventListener('click', function(){
+    document.querySelector(".stats").style.visibility = "visible";
+    document.querySelector(".extra-content").style.visibility = "hidden";
+})
+
 const saveClient = () => {
     var strStats = JSON.stringify(stats);
     var base64Stats = btoa(strStats);
@@ -764,6 +783,57 @@ function sellStock(currency){
     document.querySelector("#stocks-amount").innerHTML = `You own: ${stats.amtStocks[0]} Gold | ${stats.amtStocks[1]} Silver | ${stats.amtStocks[2]} Copper Stocks`;
 }
 
+function renderPet(){
+    setInterval(() => {
+        let namesM = ["CHRISTOPHER","JAMES","DAVID","DANIEL","MICHAEL","MATTHEW","ANDREW","RICHARD","PAUL","MARK","THOMAS","ADAM","ROBERT","JOHN","LEE","BENJAMIN","STEVEN","JONATHAN","CRAIG","STEPHEN","SIMON","NICHOLAS","PETER","ANTHONY","ALEXANDER","GARY","IAN","RYAN","LUKE","JAMIE","STUART","PHILIP","DARREN","WILLIAM","GARETH","MARTIN","KEVIN","SCOTT","DEAN","JOSEPH","JASON","NEIL","SAMUEL","CARL","BEN","SEAN","TIMOTHY","OLIVER","ASHLEY","WAYNE"]
+        let namesF = ["SARAH","LAURA","GEMMA","EMMA","REBECCA","CLAIRE","VICTORIA","SAMANTHA","RACHEL","AMY","JENNIFER","NICOLA","KATIE","LISA","KELLY","NATALIE","LOUISE","MICHELLE","HAYLEY","HANNAH","HELEN","CHARLOTTE","JOANNE","LUCY","ELIZABETH"]
+        if(stats.pet.name == null){
+            if(stats.pet.img.substring("red") !== -1){
+                stats.pet.name = namesF[Math.floor(namesF.length-1+0.5)];
+            }else{
+                stats.pet.name = namesM[Math.floor(namesM.length-1+0.5)];
+            }
+        }
+        // Pet variables/aliases
+        let happiness = stats.pet.happiness;
+        let hunger = stats.pet.hunger;
+        let thirst = stats.pet.thirst;
+        let icon = stats.pet.img;
+        let petIMGDOM = document.querySelector("#pet-img");
+        let happinessDOM = document.querySelector("#pet-happiness");
+        let hungerDOM = document.querySelector("#pet-hunger");
+        let thirstDOM = document.querySelector("#pet-thirst");
+        let nameDOM = document.querySelector("#pet-name");
+        // Dynamically changes happinessDOM based on the pet's happiness
+        if(happiness > 66){
+            happinessDOM.innerHTML = `😀 Happiness: ${happiness}`;
+        }else if(happiness < 67 && happiness > 33){
+            happinessDOM.innerHTML = `😐 Happiness: ${happiness}`;
+        }else{
+            happinessDOM.innerHTML = `😭 Happinnes: ${happiness}`;
+        }
+        // The rest do not need to be dynamically changed
+        thirstDOM.innerHTML = `🥤 Thirst: ${thirst}`;
+        hungerDOM.innerHTML = `🍖 Hunger: ${hunger}`;
+        petIMGDOM.src = icon;
+        nameDOM.innerHTML = stats.pet.name;
+    },250);
+    setInterval(() => {
+        if(stats.pet.hunger > 0){
+            stats.pet.hunger -= 1;
+        }
+        if(stats.pet.thirst > 0){
+            stats.pet.thirst -= 1;
+        }
+    },10000);
+    setInterval(() => {
+        if(stats.pet.hunger < 50 || stats.pet.thirst < 50 && stats.pet.happiness > 0){
+            stats.pet.happiness -= 1;
+        }
+    },5000);
+    return;
+}
+
 updateEquipped();
 updateHealth();
 updateInventory();
@@ -772,3 +842,4 @@ renderEnemy();
 updateMoney();
 regeneration();
 stockMarket();
+renderPet();
