@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2022-10-19
+### Added
+- Can now sell pets for their value, which goes up by 1 every 10 seconds
+
 ## [0.7.0] - 2022-10-19
 ### Added
 - Pets
@@ -59,6 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Attack, defense, Effective HP and other stats that are integral to the game
 
 [Unreleased]: https://github.com/Robbit2/Electron-RPG
+[0.7.1]: https://github.com/Robbit2/Electron-RPG/releases/tag/v0.7.1-alpha
 [0.7.0]: https://github.com/Robbit2/Electron-RPG/releases/tag/v0.7.0-alpha
 [0.6.1]: https://github.com/Robbit2/Electron-RPG/releases/tag/v0.6.1-alpha
 [0.6.0]: https://github.com/Robbit2/Electron-RPG/releases/tag/v0.6.0-alpha
