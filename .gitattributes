@@ -2,4 +2,5 @@
 * linguist-vendored
 *.js linguist-vendored=false
 *.css linguist-vendored=false
+index.html linguist-vendored=false
 /node_modules/** linguist-vendored=true
