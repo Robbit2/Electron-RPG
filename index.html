@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600&display=swap" rel="stylesheet">
-    <script defer src="https://cdn.anychart.com/releases/8.10.0/js/anychart-base.min.js"></script>
     <script defer src="script.js"></script>
     <title>RPG</title>
 </head>
@@ -24,6 +23,7 @@
         <button id="savebtn">Save</button><button id="loadbtn">Load</button>
         <button id="stats-btn">Stats</button>
         <button id="extras-btn">Extras</button>
+        <button id="shop-btn">Shop</button>
     </div>
     <div class="stats">
         <div id="equipped">
@@ -86,6 +86,10 @@
             <span id="pet-thirst">🥤 Thirst: 100</span><br>
             <button id="pet-btn" onclick="sellPet()">Sell </button>
         </div>
+    </div>
+    <div class="shop">
+        <h1>Shop</h1>
+        <div id="shop-table"></div>
     </div>
     <div id="xpTexts"></div>
 </body>

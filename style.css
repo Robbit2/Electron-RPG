@@ -176,7 +176,7 @@ body{
     font-family: 'Oswald', sans-serif;
 }
 
-.sidebar #stats-btn, .sidebar #extras-btn, #pet button {
+.sidebar #stats-btn, .sidebar #extras-btn, #pet button, #shop-btn {
     height:32px;
     width:80%;
     margin:auto;
@@ -189,7 +189,7 @@ body{
     font-family: 'Oswald', sans-serif;
 }
 
-.sidebar #stats-btn:hover, .sidebar #extras-btn:hover, #pet button:hover {
+.sidebar #stats-btn:hover, .sidebar #extras-btn:hover, #pet button:hover, #shop-btn:hover {
     border:2px solid #ddd;
     border-radius: 4px;
     font-size:16px;
@@ -381,3 +381,70 @@ body{
 #pet-name{
     font-size:28px;
 }
+
+.shop {
+    width:71vw;
+    height:97vh;
+    right:2%;
+    top:0.75%;
+    border:4px solid black;
+    display:grid;
+    margin:-1px;
+    padding:2px;
+    position:absolute;
+    font-family: 'Oswald', sans-serif;
+    visibility: hidden;
+}
+
+.shop h1{
+    height:10%;
+}
+
+#shop-table{
+    width:71vw;
+    overflow-y:scroll;
+    position:fixed;
+    top:9.75%;
+    right:2.5%;
+    height:80vh;
+}
+
+td button {
+    height:32px;
+    width:80%;
+    margin:auto;
+    border:2px solid #333;
+    border-radius: 4px;
+    font-size:16px;
+    background-color: #555;
+    color:white;
+    position:relative;
+    font-family: 'Oswald', sans-serif;
+}
+
+td button:hover {
+    border:2px solid #ddd;
+    border-radius: 4px;
+    font-size:16px;
+    background-color: #fff;
+    color:black;
+    position:relative;
+    font-family: 'Oswald', sans-serif;
+}
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+
+  }
+  
+  td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #dddddd;
+    color:#333;
+  }

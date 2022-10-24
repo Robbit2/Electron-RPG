@@ -51,7 +51,8 @@ var stats = {
         img : "./img/pets/pet_red.png",
         name : null,
         value : 0
-    }
+    },
+    shop : [[items.searchDB("accessory:bunny_mask"),[50,"copper"]]]
 };
 
 
@@ -109,11 +110,12 @@ function inForge(id){
 
 function scrap(id){
     if(confirm(`Are you sure you'd like to scrap your [Lv.${stats.inventory[id].level}] ${stats.inventory[id].reforge} ${stats.inventory[id].name} ${stats.inventory[id].stars} for 200 Silver?`) == true){
-        stats.inventory.splice(id,1);
         stats.money.silver += 200;
         alert(`You sold your [Lv.${stats.inventory[id].level}] ${stats.inventory[id].reforge} ${stats.inventory[id].name} ${stats.inventory[id].stars}`);
+        stats.inventory.splice(id,1);
         updateInventory();
     }
+    updateInventory();
 }
 
 // --- [ Returns the xp required to level up ] --- \\
@@ -182,7 +184,6 @@ function lootFromTable(table){
             }
             newUUID = uuidM.v4();
             pickItem.uuid = newUUID;
-            alert(`You found a [Lv.${pickItem.level}] ${pickItem.reforge} ${pickItem.name} ${pickItem.stars}`);
             stats.inventory.push(pickItem);
             updateEquipped();
             updateInventory();
@@ -191,6 +192,8 @@ function lootFromTable(table){
         }
 
     }
+    console.log("E");
+    return true;
 }
 
 
@@ -602,6 +605,20 @@ document.querySelector("#extras-btn").addEventListener('click', function(){
 document.querySelector("#stats-btn").addEventListener('click', function(){
     document.querySelector(".stats").style.visibility = "visible";
     document.querySelector(".extra-content").style.visibility = "hidden";
+    document.querySelector(".shop").style.visibility = "hidden";
+    updateInventory();
+})
+
+document.querySelector("#extras-btn").addEventListener('click', function(){
+    document.querySelector(".stats").style.visibility = "hidden";
+    document.querySelector(".extra-content").style.visibility = "visible";
+    document.querySelector(".shop").style.visibility = "hidden";
+})
+
+document.querySelector("#shop-btn").addEventListener('click', function(){
+    document.querySelector(".stats").style.visibility = "hidden";
+    document.querySelector(".extra-content").style.visibility = "hidden";
+    document.querySelector(".shop").style.visibility = "visible";
 })
 
 const saveClient = () => {
@@ -877,6 +894,41 @@ function renderPet(){
     return;
 }
 
+function shopBuy(item,price,currency){
+    //alert(item,currency,price)
+    //console.log(currency)
+    item = JSON.stringify(item);
+    if(stats.money[currency] >= price){
+        item = JSON.parse(item)
+        stats.money[currency] -= price;
+        newUUID = uuidM.v4();
+        item.uuid = newUUID;
+        stats.inventory.push(item);
+        updateInventory();
+        alert(`You bought the [Lv.${item.level}] ${item.reforge} ${item.name} ${item.stars} for ${price} ${capitalize(currency)}`);
+    }else{
+        item = JSON.parse(item)
+        alert(`You don't have enough ${capitalize(currency)} to buy [Lv.${item.level}] ${item.reforge} ${item.name} ${item.stars}`)
+    }
+}
+
+function renderShop(){
+   let shopDOM = document.querySelector("#shop-table");
+   let DOMstr = ""
+   DOMstr += "<table><tr><th>Name</th><th>Price</th><th>Buy</th></tr>";
+    for(_ in stats.shop){
+        var item = stats.shop[_][0];
+        let _e = JSON.stringify(item)
+        //<span>[Lv.${item.level}] <b>${item.reforge}</b> ${item.name} ${item.stars}</span><br><img src="${item.img}" height="128px" width="128px"><br><span>Price: ${numeral(stats.shop[_][1][0]).format("0.0a")} ${stats.shop[_][1][1]}</span><br><button onclick="shopBuy(${item},${stats.shop[_][1][0]},${stats.shop[_][1][1]})">Buy</button>
+        //<tr><td>[Lv.${item.level}] ${item.reforge} ${item.name} ${item.stars}</td><td>${stats.shop[_][1][0]} ${stats.shop[_][1][1]}</td><td></td></tr>
+        //shopDOM.innerHTML += `<button onclick="shopBuy(${JSON.stringify(item)},${stats.shop[_][1][0]},${stats.shop[_][1][1]})">Buy</button>`;
+        DOMstr += `<tr><td>[Lv.${item.level}] ${item.reforge} ${item.name} ${item.stars}</td><td>${stats.shop[_][1][0]} ${stats.shop[_][1][1]}</td><td><button onclick='shopBuy(${_e},${stats.shop[_][1][0]},"${stats.shop[_][1][1].toString()}")'>Buy</button></td></tr>`;
+    }
+    DOMstr += "</table>";
+    shopDOM.innerHTML = DOMstr;
+    console.log(DOMstr)
+}
+
 updateEquipped();
 updateHealth();
 updateInventory();
@@ -886,3 +938,4 @@ updateMoney();
 regeneration();
 stockMarket();
 renderPet();
+renderShop();
