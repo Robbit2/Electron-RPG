@@ -23,6 +23,7 @@ var stats = {
     regen: 100, // Gets smaller to regen more /s
     level: 1,
     xp: 0,
+    souls: 0,
     inventory : [{name:"☤ ☥ Steel Sword",img:"./img/items/weapons/swords/steel_sword.png",id:"weapon:steel_sword",atk:20,def:0,type:"weapon",rarity:"#a8a8a8",level:4,gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0}],
     equipped : {
         head : null,
@@ -89,6 +90,9 @@ function updateInventory(){
     const invDOM = document.querySelector("#inventory");
     invDOM.innerHTML = "";
     for(_ in stats.inventory){
+        if(!stats.inventory[_].uuid){
+            stats.inventory[_].uuid = uuidM.v4();
+        }
         invDOM.innerHTML += `<div class="tooltip" style="height:64px;width:64px;background-color:${stats.inventory[_].rarity};background-image:url(${stats.inventory[_].img});background-size: cover;border:4px solid rgb(92, 91, 91);"><span class="tooltiptext">[Lv.${stats.inventory[_].level}] <b>${stats.inventory[_].reforge}</b> ${stats.inventory[_].name} ${stats.inventory[_].stars}</span><div class="dropdown">
         <button class="dropbtn">▼</button><div class="dropdown-content"><a href="#" onclick="equip(${_})">Equip</a><a href="#" onclick="inForge(${_})">Forge</a><a href="#" onclick="scrap(${_})">Scrap</a></div></div></div>`;
     }
@@ -472,6 +476,7 @@ function updateHealth(){
     const eHPTxt = document.querySelector("#ehpTxt");
     const xpTxt = document.querySelector("#xp");
     const lvlTxt = document.querySelector("#level");
+    const soulsTxt = document.querySelector("#souls");
     setInterval(() => {
         var _stats = addStats();
         var health = stats.health;
@@ -494,6 +499,7 @@ function updateHealth(){
         eHPTxt.innerHTML = `💚 Effective Health: ${eHP()}`;
         xpTxt.innerHTML = `⚗️ XP: ${stats.xp}/${xpReq()}`;
         lvlTxt.innerHTML = `🏅 Level: ${stats.level}`;
+        soulsTxt.innerHTML = `💙 Souls: ${stats.souls}`;
         if(stats.health > stats.maxHealth){
             stats.health = stats.maxHealth;
         }if(stats.health <= 0){
@@ -599,6 +605,8 @@ document.querySelector("#savebtn").addEventListener('click', function(){
 document.querySelector("#extras-btn").addEventListener('click', function(){
     document.querySelector(".stats").style.visibility = "hidden";
     document.querySelector(".extra-content").style.visibility = "visible";
+    document.querySelector(".black-market").style.visibility = "hidden";
+    document.querySelector(".shop").style.visibility = "hidden";
 })
 
 // --- [ Shows .stats ] --- \\
@@ -606,6 +614,7 @@ document.querySelector("#stats-btn").addEventListener('click', function(){
     document.querySelector(".stats").style.visibility = "visible";
     document.querySelector(".extra-content").style.visibility = "hidden";
     document.querySelector(".shop").style.visibility = "hidden";
+    document.querySelector(".black-market").style.visibility = "hidden";
     updateInventory();
 })
 
@@ -613,12 +622,21 @@ document.querySelector("#extras-btn").addEventListener('click', function(){
     document.querySelector(".stats").style.visibility = "hidden";
     document.querySelector(".extra-content").style.visibility = "visible";
     document.querySelector(".shop").style.visibility = "hidden";
+    document.querySelector(".black-market").style.visibility = "hidden";
 })
 
 document.querySelector("#shop-btn").addEventListener('click', function(){
     document.querySelector(".stats").style.visibility = "hidden";
     document.querySelector(".extra-content").style.visibility = "hidden";
     document.querySelector(".shop").style.visibility = "visible";
+    document.querySelector(".black-market").style.visibility = "hidden";
+})
+
+document.querySelector("#black-market-btn").addEventListener('click', function(){
+    document.querySelector(".stats").style.visibility = "hidden";
+    document.querySelector(".extra-content").style.visibility = "hidden";
+    document.querySelector(".shop").style.visibility = "hidden";
+    document.querySelector(".black-market").style.visibility = "visible";
 })
 
 const saveClient = () => {

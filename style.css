@@ -176,7 +176,7 @@ body{
     font-family: 'Oswald', sans-serif;
 }
 
-.sidebar #stats-btn, .sidebar #extras-btn, #pet button, #shop-btn {
+.sidebar #stats-btn, .sidebar #extras-btn, #pet button, #shop-btn, #black-market-btn {
     height:32px;
     width:80%;
     margin:auto;
@@ -189,7 +189,7 @@ body{
     font-family: 'Oswald', sans-serif;
 }
 
-.sidebar #stats-btn:hover, .sidebar #extras-btn:hover, #pet button:hover, #shop-btn:hover {
+.sidebar #stats-btn:hover, .sidebar #extras-btn:hover, #pet button:hover, #shop-btn:hover, #black-market-btn:hover {
     border:2px solid #ddd;
     border-radius: 4px;
     font-size:16px;
@@ -382,7 +382,7 @@ body{
     font-size:28px;
 }
 
-.shop {
+.shop, .black-market {
     width:71vw;
     height:97vh;
     right:2%;
