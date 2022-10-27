@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] - 2022-10-27
+### Added
+- The Black Market, an unlockable shop where you can buy things that you can't get anywhere else, for souls
+- Souls, a currency obtained my killing monsters and is usable to buy items from the Black Market
+
 ## [0.8.0] - 2022-10-24
 ### Added
 - A shop, where you can buy items for a specified price
@@ -67,6 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Attack, defense, Effective HP and other stats that are integral to the game
 
 [Unreleased]: https://github.com/Robbit2/Electron-RPG
+[0.8.1]: https://github.com/Robbit2/Electron-RPG/releases/tag/v0.8.1-alpha
 [0.8.0]: https://github.com/Robbit2/Electron-RPG/releases/tag/v0.8.0-alpha
 [0.7.1]: https://github.com/Robbit2/Electron-RPG/releases/tag/v0.7.1-alpha
 [0.7.0]: https://github.com/Robbit2/Electron-RPG/releases/tag/v0.7.0-alpha
