@@ -488,3 +488,17 @@ table {
     position:relative;
     font-family: 'Oswald', sans-serif;
 }
+
+.disabled-button {
+    color:white;
+    border:3px solid #121212;
+    background:black;
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+}

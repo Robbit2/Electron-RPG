@@ -54,7 +54,8 @@ var stats = {
         value : 0
     },
     shop : [[items.searchDB("accessory:bunny_mask"),[50,"copper"]]],
-    blackMarket : [[items.searchDB("accessory:bunny_mask"),50]]
+    blackMarket : [[items.searchDB("accessory:bunny_mask"),50]],
+    bmUnlocked: false
 };
 
 
@@ -647,13 +648,54 @@ document.querySelector("#shop-btn").addEventListener('click', function(){
     document.querySelector(".shop").style.visibility = "visible";
     document.querySelector(".black-market").style.visibility = "hidden";
 })
-
+/*
 document.querySelector("#black-market-btn").addEventListener('click', function(){
     document.querySelector(".stats").style.visibility = "hidden";
     document.querySelector(".extra-content").style.visibility = "hidden";
     document.querySelector(".shop").style.visibility = "hidden";
     document.querySelector(".black-market").style.visibility = "visible";
 })
+*/
+
+function showBM(){
+    if(stats.bmUnlocked === true){
+        document.querySelector(".stats").style.visibility = "hidden";
+        document.querySelector(".extra-content").style.visibility = "hidden";
+        document.querySelector(".shop").style.visibility = "hidden";
+        document.querySelector(".black-market").style.visibility = "visible";
+    }
+}
+
+function updateSidebar(){
+    let _ = false;
+    /*
+    if(stats.bmUnlocked === true){
+        document.querySelector("#black-market-btn").disabled = false;
+        document.querySelector("#black-market-btn").style.background = "#555";
+        document.querySelector("#black-market-btn").style.border = "2px solid #333";
+        document.querySelector("#black-market-btn").innerHTML = "Black Market";
+    }*/
+    setInterval(() => {
+        if(stats.bmUnlocked !== true){
+            document.querySelector("#black-market-btn").disabled = true;
+            document.querySelector("#black-market-btn").style.color = "white";
+            document.querySelector("#black-market-btn").style.background = "black";
+            document.querySelector("#black-market-btn").style.border = "3px solid #121212";
+            document.querySelector("#black-market-btn").innerHTML = `<span class="material-symbols-outlined">lock</span> <span>LOCKED</span>`;
+        }else{
+            if(_ == true){
+                document.querySelector("#black-market-btn").addEventListener("mouseenter", (event) => {event.target.style.border = "2px solid #ddd";event.target.style.color = "black";event.target.style.background = "#fff"});
+                document.querySelector("#black-market-btn").addEventListener("mouseleave", (event) => {event.target.style.border = "2px solid #333";event.target.style.color = "white";event.target.style.background = "#555"});
+            }else{
+                document.querySelector("#black-market-btn").disabled = false;
+                document.querySelector("#black-market-btn").style.background = "#555";
+                document.querySelector("#black-market-btn").style.border = "2px solid #333";
+                document.querySelector("#black-market-btn").innerHTML = "Black Market";
+                _ = true;
+            }
+        }
+    },250)
+}
 
 const saveClient = () => {
     var strStats = JSON.stringify(stats);
@@ -1004,3 +1046,4 @@ stockMarket();
 renderPet();
 renderShop();
 renderBlackMarket();
+updateSidebar();
