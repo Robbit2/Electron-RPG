@@ -400,7 +400,7 @@ body{
     height:10%;
 }
 
-#shop-table{
+#shop-table, #bm-table{
     width:71vw;
     overflow-y:scroll;
     position:fixed;
@@ -448,3 +448,43 @@ table {
     background-color: #dddddd;
     color:#333;
   }
+
+#bm div{
+    height:200px;
+    width:200px;
+    background: rgb(193,193,193);
+    background: linear-gradient(180deg, rgb(54, 54, 54) 0%, rgb(66, 66, 66) 100%);
+    border:2px solid black;
+    border-radius:5%;
+    text-align:center;
+}
+
+#bm div img{
+    height:128px;
+    width:128px;
+    border:2px solid black;
+    border-radius:5%;
+}
+
+#bm div button {
+    height:32px;
+    width:25%;
+    margin:auto;
+    border:2px solid #333;
+    border-radius: 4px;
+    font-size:16px;
+    background-color: #555;
+    color:white;
+    position:relative;
+    font-family: 'Oswald', sans-serif;
+}
+
+#bm div button:hover {
+    border:2px solid #ddd;
+    border-radius: 4px;
+    font-size:16px;
+    background-color: #fff;
+    color:black;
+    position:relative;
+    font-family: 'Oswald', sans-serif;
+}

@@ -24,7 +24,7 @@ var stats = {
     level: 1,
     xp: 0,
     souls: 0,
-    inventory : [{name:"☤ ☥ Steel Sword",img:"./img/items/weapons/swords/steel_sword.png",id:"weapon:steel_sword",atk:20,def:0,type:"weapon",rarity:"#a8a8a8",level:4,gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0}],
+    inventory : [{name:"☤ ☥ Steel Sword",img:"./img/items/weapons/swords/steel_sword.png",id:"weapon:steel_sword",atk:20,def:0,type:"weapon",rarity:"#7c0bb5",level:4,ability:function(){alert("debugging abilities")},gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0}],
     equipped : {
         head : null,
         chest : null,
@@ -53,7 +53,8 @@ var stats = {
         name : null,
         value : 0
     },
-    shop : [[items.searchDB("accessory:bunny_mask"),[50,"copper"]]]
+    shop : [[items.searchDB("accessory:bunny_mask"),[50,"copper"]]],
+    blackMarket : [[items.searchDB("accessory:bunny_mask"),50]]
 };
 
 
@@ -93,8 +94,11 @@ function updateInventory(){
         if(!stats.inventory[_].uuid){
             stats.inventory[_].uuid = uuidM.v4();
         }
-        invDOM.innerHTML += `<div class="tooltip" style="height:64px;width:64px;background-color:${stats.inventory[_].rarity};background-image:url(${stats.inventory[_].img});background-size: cover;border:4px solid rgb(92, 91, 91);"><span class="tooltiptext">[Lv.${stats.inventory[_].level}] <b>${stats.inventory[_].reforge}</b> ${stats.inventory[_].name} ${stats.inventory[_].stars}</span><div class="dropdown">
-        <button class="dropbtn">▼</button><div class="dropdown-content"><a href="#" onclick="equip(${_})">Equip</a><a href="#" onclick="inForge(${_})">Forge</a><a href="#" onclick="scrap(${_})">Scrap</a></div></div></div>`;
+        if(stats.inventory[_].type === "consumable.heal"){
+            invDOM.innerHTML += `<div class="tooltip" style="height:64px;width:64px;background-color:${stats.inventory[_].rarity};background-image:url(${stats.inventory[_].img});background-size: cover;border:4px solid rgb(92, 91, 91);"><span class="tooltiptext">[Lv.${stats.inventory[_].level}] <b>${stats.inventory[_].reforge}</b> ${stats.inventory[_].name} ${stats.inventory[_].stars}</span><div class="dropdown"><button class="dropbtn">▼</button><div class="dropdown-content"><a href="#" onclick="equip(${_})">Use</a><a href="#" onclick="inForge(${_})">Forge</a><a href="#" onclick="scrap(${_})">Scrap</a></div></div></div>`;
+        }else{
+            invDOM.innerHTML += `<div class="tooltip" style="height:64px;width:64px;background-color:${stats.inventory[_].rarity};background-image:url(${stats.inventory[_].img});background-size: cover;border:4px solid rgb(92, 91, 91);"><span class="tooltiptext">[Lv.${stats.inventory[_].level}] <b>${stats.inventory[_].reforge}</b> ${stats.inventory[_].name} ${stats.inventory[_].stars}</span><div class="dropdown"><button class="dropbtn">▼</button><div class="dropdown-content"><a href="#" onclick="equip(${_})">Equip</a><a href="#" onclick="inForge(${_})">Forge</a><a href="#" onclick="scrap(${_})">Scrap</a></div></div></div>`;
+        }
     }
 }
 
@@ -196,7 +200,6 @@ function lootFromTable(table){
         }
 
     }
-    console.log("E");
     return true;
 }
 
@@ -251,6 +254,14 @@ function getExp(){
 }
 
 
+function getSouls(){
+    if(stats.equipped.weapon.id === "weapon:soul_reaper"){
+        stats.souls += stats.equipped.weapon.level;
+    }else{
+        stats.souls ++;
+    }
+}
+
 // --- [ renders enemy, such as the health and attack ] --- \\
 function renderEnemy(){
     const enemyhpDOM = document.querySelector("#enemy-health");
@@ -269,6 +280,7 @@ function renderEnemy(){
             lootFromTable(stats.currentEnemy.getStats()[5]);
             dropCoins();
             stats.currentEnemy = null;
+            getSouls();
             getExp();
             chooseEnemy();
         }
@@ -574,6 +586,10 @@ function equip(id){
         stats.inventory.splice(id,1);
         stats.health += item.healVal;
         eatSound.play();
+    }if(item.ability !== null && item.ability !== undefined){
+        if(item.type === "accessory.1" && item.type === "accessory.2"){
+            item.ability();
+        }
     }
     updateEquipped();
     updateInventory();
@@ -654,7 +670,10 @@ function attack(){
     stats.currentEnemy.health -= passE;
     stats.health -= passP;
     hitSound.play();
-    floatText(numeral(passE).format("0,0"),"HP","red")
+    floatText(numeral(passE).format("0,0"),"HP","red");
+    if(stats.equipped.weapon.ability !== null && stats.equipped.weapon.ability !== undefined){
+        stats.equipped.weapon.ability();
+    }
 }
 
 function updateMoney(){
@@ -828,7 +847,6 @@ function generateName(gender){
     let namesM = ["CHRISTOPHER","JAMES","DAVID","DANIEL","MICHAEL","MATTHEW","ANDREW","RICHARD","PAUL","MARK","THOMAS","ADAM","ROBERT","JOHN","LEE","BENJAMIN","STEVEN","JONATHAN","CRAIG","STEPHEN","SIMON","NICHOLAS","PETER","ANTHONY","ALEXANDER","GARY","IAN","RYAN","LUKE","JAMIE","STUART","PHILIP","DARREN","WILLIAM","GARETH","MARTIN","KEVIN","SCOTT","DEAN","JOSEPH","JASON","NEIL","SAMUEL","CARL","BEN","SEAN","TIMOTHY","OLIVER","ASHLEY","WAYNE"]
     let namesF = ["SARAH","LAURA","GEMMA","EMMA","REBECCA","CLAIRE","VICTORIA","SAMANTHA","RACHEL","AMY","JENNIFER","NICOLA","KATIE","LISA","KELLY","NATALIE","LOUISE","MICHELLE","HAYLEY","HANNAH","HELEN","CHARLOTTE","JOANNE","LUCY","ELIZABETH"] 
     if(gender.toLowerCase() == "m"|| gender.toLowerCase() == "male"){
-        console.log(namesM[Math.floor(Math.random()*namesM.length+1)+0.5]);
         return capitalize(namesM[Math.floor((Math.random()*namesM.length-1)+0.5)]);
     }else{
         return capitalize(namesF[Math.floor((Math.random()*namesF.length-1)+0.5)]);
@@ -925,8 +943,8 @@ function shopBuy(item,price,currency){
         updateInventory();
         alert(`You bought the [Lv.${item.level}] ${item.reforge} ${item.name} ${item.stars} for ${price} ${capitalize(currency)}`);
     }else{
-        item = JSON.parse(item)
-        alert(`You don't have enough ${capitalize(currency)} to buy [Lv.${item.level}] ${item.reforge} ${item.name} ${item.stars}`)
+        item = JSON.parse(item);
+        alert(`You don't have enough ${capitalize(currency)} to buy [Lv.${item.level}] ${item.reforge} ${item.name} ${item.stars}`);
     }
 }
 
@@ -944,7 +962,35 @@ function renderShop(){
     }
     DOMstr += "</table>";
     shopDOM.innerHTML = DOMstr;
-    console.log(DOMstr)
+}
+
+function blackMarketBuy(item,price){
+    item = JSON.stringify(item);
+    if(stats.souls >= price){
+        item = JSON.parse(item);
+        stats.souls -= price;
+        newUUID = uuidM.v4();
+        item.uuid = newUUID;
+        stats.inventory.push(item);
+        updateInventory();
+        alert(`You bought the [Lv.${item.level}] ${item.reforge} ${item.name} ${item.stars} for ${price} Souls`);
+    }else{
+        item = JSON.parse(item)
+        alert(`You don't have enough Souls to buy [Lv.${item.level}] ${item.reforge} ${item.name} ${item.stars}`)
+    }
+}
+
+function renderBlackMarket(){
+   let bmDOM = document.querySelector("#bm-table");
+   let DOMstr = ""
+   DOMstr += "<table><tr><th>Name</th><th>Price</th><th>Buy</th></tr>";
+    for(_ in stats.shop){
+        var item = stats.shop[_][0];
+        let _e = JSON.stringify(item)
+        DOMstr += `<tr><td>[Lv.${item.level}] ${item.reforge} ${item.name} ${item.stars}</td><td>${stats.shop[_][1][0]} Souls</td><td><button onclick='blackMarketBuy(${_e},${stats.shop[_][1][0]})'>Buy</button></td></tr>`;
+    }
+    DOMstr += "</table>";
+    bmDOM.innerHTML = DOMstr;
 }
 
 updateEquipped();
@@ -957,3 +1003,4 @@ regeneration();
 stockMarket();
 renderPet();
 renderShop();
+renderBlackMarket();
