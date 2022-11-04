@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.3] - 2022-11-4
+### Added
+- Dropdown where you can change your current Area 
+- The maxArea you can go to
+
+### Changed
+- Made enemies spawn based off of area, not level
+
 ## [0.8.2] - 2022-10-27
 ### Changed
 - Made the Black Market an unlockable section, making the button say locked if you have not unlocked the Black Market
@@ -76,6 +84,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Attack, defense, Effective HP and other stats that are integral to the game
 
 [Unreleased]: https://github.com/Robbit2/Electron-RPG
+[0.8.3]: https://github.com/Robbit2/Electron-RPG/releases/tag/v0.8.3-alpha
 [0.8.2]: https://github.com/Robbit2/Electron-RPG/releases/tag/v0.8.2-alpha
 [0.8.1]: https://github.com/Robbit2/Electron-RPG/releases/tag/v0.8.1-alpha
 [0.8.0]: https://github.com/Robbit2/Electron-RPG/releases/tag/v0.8.0-alpha
