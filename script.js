@@ -7,6 +7,7 @@ const { stat } = require('original-fs');
 const uuidM = require("uuid");
 const numeral = require("numeral");
 const moment = require("moment");
+const bosses = require("./bosses");
 
 // --- [ Audio Sources ] --- \\
 const eatSound = new Audio("./audio/eat.wav");
@@ -24,7 +25,7 @@ var stats = {
     level: 1,
     xp: 0,
     souls: 0,
-    inventory : [{name:"☤ ☥ Steel Sword",img:"./img/items/weapons/swords/steel_sword.png",id:"weapon:steel_sword",atk:20,def:0,type:"weapon",rarity:"#7c0bb5",level:4,ability:function(){alert("debugging abilities")},gilded:false,stars:"",reforge:"",atkBuff:0,defBuff:0}],
+    inventory : [{name:"☤ ☥ Steel Sword",img:"./img/items/weapons/swords/steel_sword.png",id:"weapon:steel_sword",atk:20,def:0,type:"weapon",rarity:"#7c0bb5",level:4,ability:function(){alert("debugging abilities")},gilded:true,stars:"✪✪✪✪✪",reforge:"",atkBuff:0,defBuff:0}],
     equipped : {
         head : null,
         chest : null,
@@ -55,7 +56,9 @@ var stats = {
     },
     shop : [[items.searchDB("accessory:bunny_mask"),[50,"copper"]]],
     blackMarket : [[items.searchDB("accessory:bunny_mask"),50]],
-    bmUnlocked: false
+    bmUnlocked: false,
+    area : 1,
+    maxArea : 1
 };
 
 
@@ -69,14 +72,14 @@ stats.inventory.push(items.searchDB("armor:steel_boots"));
 // --- [ level, health, defense, attack, loot] --- \\
 function chooseEnemy(){
     if(stats.currentEnemy == null){
-        if(stats.level <= 10){
+        if(stats.area === 1){
             let randInt = Math.floor(Math.random()* 2);
             if(randInt == 0){
                 stats.currentEnemy = new enemies.large_rat(Math.ceil(Math.random()*10),Math.ceil(Math.random()*100),Math.ceil(Math.random()*10),Math.ceil(Math.random()*10),area1Loot);
             }else{
                 stats.currentEnemy = new enemies.slime(Math.ceil(Math.random()*10),Math.ceil(Math.random()*100),Math.ceil(Math.random()*10),Math.ceil(Math.random()*10),area1Loot);
             }
-        }else if(stats.level >= 11 && stats.level <= 20){
+        }else if(stats.area === 2){
             let randInt = Math.floor(Math.random()* 2);
             if(randInt == 0){
                 stats.currentEnemy = new enemies.floating_eye(Math.ceil(Math.random()*10)+10,Math.ceil(Math.random()*100)+50,Math.ceil(Math.random()*20),Math.ceil(Math.random()*20),area2Loot);
@@ -211,6 +214,12 @@ function levelUp(){
     stats.level += 1;
     stats.maxHealth = Math.ceil(stats.maxHealth * 1.15);
     stats.health = stats.maxHealth;
+    stats.defense = Math.ceil(stats.defense * 1.15);
+    stats.attack = Math.ceil(stats.attack * 1.15);
+    if(stats.level % 10 === 0){
+        stats.area = stats.level / 10 + 1;
+        stats.maxArea = stats.level / 10 + 1;
+    }
 }
 
 
@@ -271,9 +280,9 @@ function renderEnemy(){
     const enemyimg = document.querySelector("#enemy-img");
     const enemyName = document.querySelector("#enemy-name")
     setInterval(() => {
-        enemyhpDOM.innerHTML = `❤️ Health: ${stats.currentEnemy.getStats()[0]}`;
-        enemydefDOM.innerHTML = `🛡️ Defense: ${stats.currentEnemy.getStats()[1]}`;
-        enemyatkDOM.innerHTML = `⚔️ Attack: ${stats.currentEnemy.getStats()[2]}`;
+        enemyhpDOM.innerHTML = `❤️ Health: ${numeral(stats.currentEnemy.getStats()[0]).format("0.0a")}`;
+        enemydefDOM.innerHTML = `🛡️ Defense: ${numeral(stats.currentEnemy.getStats()[1]).format("0.0a")}`;
+        enemyatkDOM.innerHTML = `⚔️ Attack: ${numeral(stats.currentEnemy.getStats()[2]).format("0.0a")}`;
         enemyimg.src = stats.currentEnemy.img;
         enemyName.innerHTML = stats.currentEnemy.name();
         if(stats.currentEnemy.health <= 0){
@@ -411,16 +420,34 @@ function addStar(){
                     updateForge();
                     stats.inventory.splice(_,1);
                     updateInventory();
-                    stats.forge.atk *= 1.25;
-                    stats.forge.def *= 1.25;
+                    stats.forge.atk = Math.ceil(stats.forge.atk * 1.25);
+                    stats.forge.def = Math.ceil(stats.forge.def * 1.25);
                 }else{
                     alert("Item must be masterforged!")
                 }
                 break
             }
         }
-    }else{
-        alert("Item already has 5 stars!")
+    }if(stats.forge.stars.includes("✪") && stats.forge.stars.length === 5){
+        let stars = stats.forge.stars.split("");
+        for(_ in stars){
+            if(stars[_] === "✪"){
+                console.log(_)
+                if(stats.souls >= (parseInt(_)+1)*50){
+                    stars[_] = "⍟";
+                    stats.forge.stars = stars.join("");
+                    stats.forge.atk = Math.ceil(stats.forge.atk * 1.5);
+                    stats.forge.def = Math.ceil(stats.forge.def * 1.5);
+                    stats.souls -= (parseInt(_)+1)*50;
+                    updateForge();
+                    break;
+                }else{
+                    alert(`You don't have enough souls!\nNeed: ${(parseInt(_)+1)*50}`);
+                    break;
+                }
+            }
+        }
+        return;
     }
 }
 
@@ -502,17 +529,17 @@ function updateHealth(){
             }
         }
         if(stats.health <= stats.maxHealth / 2){
-            healthTxt.innerHTML = `💔 Health: ${numeral(stats.health).format("0,0")}/${numeral(stats.maxHealth).format("0,0")}`;
+            healthTxt.innerHTML = `💔 Health: ${numeral(stats.health).format("0.0a")}/${numeral(stats.maxHealth).format("0.0a")}`;
         }else{
-            healthTxt.innerHTML = `❤️ Health: ${numeral(stats.health).format("0,0")}/${numeral(stats.maxHealth).format("0,0")}`;
+            healthTxt.innerHTML = `❤️ Health: ${numeral(stats.health).format("0.0a")}/${numeral(stats.maxHealth).format("0.0a")}`;
         }
         // --- [ _stats is the addStats function, 0 is attack & 1 is defense ] --- \\
-        defenseTxt.innerHTML = `🛡️ Defense: ${_stats[1]}`;
-        attackTxt.innerHTML = `⚔️ Attack: ${_stats[0]}`;
-        eHPTxt.innerHTML = `💚 Effective Health: ${eHP()}`;
-        xpTxt.innerHTML = `⚗️ XP: ${stats.xp}/${xpReq()}`;
+        defenseTxt.innerHTML = `🛡️ Defense: ${numeral(_stats[1]).format("0.0a")}`;
+        attackTxt.innerHTML = `⚔️ Attack: ${numeral(_stats[0]).format("0.0a")}`;
+        eHPTxt.innerHTML = `💚 Effective Health: ${numeral(eHP()).format("0.0a")}`;
+        xpTxt.innerHTML = `⚗️ XP: ${numeral(stats.xp).format("0.0a")}/${numeral(xpReq()).format("0.0a")}`;
         lvlTxt.innerHTML = `🏅 Level: ${stats.level}`;
-        soulsTxt.innerHTML = `💙 Souls: ${stats.souls}`;
+        soulsTxt.innerHTML = `💙 Souls: ${numeral(stats.souls).format("0,0")}`;
         if(stats.health > stats.maxHealth){
             stats.health = stats.maxHealth;
         }if(stats.health <= 0){
@@ -713,8 +740,10 @@ function attack(){
     stats.health -= passP;
     hitSound.play();
     floatText(numeral(passE).format("0,0"),"HP","red");
-    if(stats.equipped.weapon.ability !== null && stats.equipped.weapon.ability !== undefined){
-        stats.equipped.weapon.ability();
+    if(stats.equipped.weapon !== null){
+        if(stats.equipped.weapon.ability !== null){
+            stats.equipped.weapon.ability();
+        }
     }
 }
 
@@ -1035,6 +1064,15 @@ function renderBlackMarket(){
     bmDOM.innerHTML = DOMstr;
 }
 
+function updateArea(){
+    setInterval(() => {
+        document.querySelector("#areaSelect").innerHTML = "";
+        for (let i = 0; i < stats.maxArea; i++) {
+            document.querySelector("#areaSelect").innerHTML += `<option value="${i+1}">Area ${i+1}</option>`;
+        }
+    },1000)
+}
+
 updateEquipped();
 updateHealth();
 updateInventory();
@@ -1047,3 +1085,4 @@ renderPet();
 renderShop();
 renderBlackMarket();
 updateSidebar();
+updateArea();
